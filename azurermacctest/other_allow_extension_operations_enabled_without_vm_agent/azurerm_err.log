@@ -1,0 +1,20 @@
+Test Case: other_allow_extension_operations_enabled_without_vm_agent
+================================================================================
+
+Step 2 Failed - AzureRM Baseline Validation
+
+Error:
+llow_extension_operations cannot be set to 	rue when provision_vm_agent is set to alse
+
+Configuration:
+- allow_extension_operations = true
+- provision_vm_agent = false
+
+Conclusion:
+This is an invalid configuration according to AzureRM provider validation rules.
+The provider explicitly prohibits setting allow_extension_operations to true when 
+provision_vm_agent is false. This test case cannot proceed as the baseline 
+AzureRM configuration itself is invalid.
+
+This appears to be testing an edge case or error condition that the provider 
+actively prevents, making the test case invalid for migration testing purposes.

@@ -1,0 +1,1 @@
+Test Case: disk_os_caching_type_read_only | Error: computer name cannot exceed 15 characters, got 17 | Fix: Changed random_string length from 8 to 6 in main.tf | Result: Success

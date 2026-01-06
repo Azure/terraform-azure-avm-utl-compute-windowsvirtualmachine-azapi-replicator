@@ -1,0 +1,1 @@
+Test Case: orchestrated_zonal_with_proximity_placement_group | Error: computer name cannot be more than 15 characters (got 17 with acctestvm + 8 chars) | Fix: Reduced random_string.name length from 8 to 5 (acctestvm + 5 = 14 chars) | Result: Retrying apply

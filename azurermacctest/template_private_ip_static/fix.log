@@ -1,0 +1,59 @@
+Test Case: template_private_ip_static
+================================================================================
+
+Initial Error:
+Error: Missing required argument
+  on azapi.tf line 1, in module "replicator":
+   1: module "replicator" {
+The argument "resource_group_id" is required, but no definition was found.
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: The module replicator requires a resource_group_id argument that was missing in azapi.tf
+- Fix Method: Added resource_group_id parameter to module call
+- Changes Made: Added line "resource_group_id = azurerm_resource_group.test.id" to module replicator block
+- Result: Success, but new error appeared
+
+New Error:
+Error: Invalid value for variable
+When admin_password is set, admin_password_version must also be set.
+This was checked by the validation rule at migrate_variables.tf:14,3-13.
+
+Attempt 2:
+- Problem Analysis: The module requires admin_password_version to be set when admin_password is provided
+- Fix Method: Add admin_password_version parameter with timestamp value
+- Changes Made: Adding "admin_password_version = timestamp()" to module replicator block
+- Result: Success, but new error appeared
+
+New Error:
+Error: Attempt to get attribute from null value
+  on azapi.tf line 46, in resource "azapi_resource" "this":
+  46:       type         = identity.value.type
+This value is null, so it does not have any attributes.
+
+Attempt 3:
+- Problem Analysis: The identity block uses can() to check for identity, but can() returns true even for null values. Need to check for both existence and non-null.
+- Fix Method: Change dynamic block condition to check if identity is not null
+- Changes Made: Changed "for_each = can(module.replicator.azapi_header.identity) ? [module.replicator.azapi_header.identity] : []" to "for_each = module.replicator.azapi_header.identity != null ? [module.replicator.azapi_header.identity] : []"
+- Result: Success - plan shows acceptable drifts (AzAPI attributes + computed defaults), but apply failed
+
+New Error during apply:
+Error: Invalid value for input variable
+  on azapi.tf line 11, in module "replicator":
+  11:   admin_password_version   = timestamp()
+The given value is not suitable for module.replicator.var.admin_password_version declared at migrate_variables.tf:9,1-34: a number is required.
+
+Attempt 4:
+- Problem Analysis: admin_password_version expects a number type, not a string from timestamp()
+- Fix Method: Use plantimestamp() to get a numeric Unix timestamp
+- Changes Made: Changed "admin_password_version = timestamp()" to "admin_password_version = plantimestamp()"
+- Result: Failed - plantimestamp() also returns string
+
+Attempt 5:
+- Problem Analysis: admin_password_version requires a number type. Using a simple numeric constant.
+- Fix Method: Use a numeric constant like 1 for the version
+- Changes Made: Changed "admin_password_version = plantimestamp()" to "admin_password_version = 1"
+- Result: Success - apply completed, verifying idempotency...
+
+Final Result: Fix successful - state migration completed with acceptable drifts

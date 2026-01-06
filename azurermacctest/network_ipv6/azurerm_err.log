@@ -1,0 +1,30 @@
+Test Case: network_ipv6
+================================================================================
+
+Test Failed - Marked as INVALID
+
+Step 2 (Baseline AzureRM Test) - Apply Failed
+
+Initial Error (after random_string length fix):
+NetworkingInternalOperationError: An unexpected error occured while processing the network profile of the VM.
+
+Root Cause Analysis:
+The test configuration has a network interface with two IP configurations:
+1. Primary IPv4 configuration with subnet
+2. Secondary IPv6 configuration without subnet
+
+According to Azure requirements, IPv6 IP configurations need:
+- The subnet must have both IPv4 and IPv6 address spaces configured
+- The secondary IPv6 configuration is missing proper subnet configuration
+
+The main.tf creates a subnet with only IPv4 address prefix ("10.0.2.0/24"), but the NIC's secondary IP configuration attempts to use IPv6 ("private_ip_address_version = IPv6") without an IPv6 subnet.
+
+This is a fundamental configuration issue in the original test case extraction. The AzureRM Provider test likely had additional subnet configuration for IPv6 that wasn't included in the extracted test case.
+
+Conclusion:
+This test case configuration is invalid and cannot be used for baseline testing. The test case needs IPv6 subnet configuration to work properly, but main.tf only defines IPv4 subnets.
+
+Attempted Fixes:
+1. Fixed computer name length issue by reducing random_string from 8 to 6 characters
+2. Encountered NetworkingInternalOperationError due to missing IPv6 subnet configuration
+3. Confirmed this is a fundamental configuration issue that makes the test case invalid

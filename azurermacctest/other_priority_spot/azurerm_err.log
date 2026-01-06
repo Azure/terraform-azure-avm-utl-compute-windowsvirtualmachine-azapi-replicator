@@ -1,0 +1,26 @@
+Test Case: other_priority_spot
+================================================================================
+
+Step 2 - Baseline AzureRM Configuration Test Failed
+
+Failed Command: terraform apply -auto-approve -input=false
+
+Error:
+creating Windows Virtual Machine (Subscription: "f7a632a5-49db-4c5e-9828-cd62cb753971"
+Resource Group Name: "acctestRG-232091"
+Virtual Machine Name: "acctestvm2wc5m3"): performing CreateOrUpdate: unexpected status 409 (409 Conflict) with error:
+SkuNotAvailable: The requested VM size for resource 'Following SKUs have failed for Capacity Restrictions: Standard_F2'
+is currently not available in location 'eastus'. Please try another size or deploy to a different location or different
+zone. See https://aka.ms/azureskunotavailable for details.
+
+Root Cause Analysis:
+The Standard_F2 VM size is not available in the eastus region due to capacity restrictions. This is an Azure platform
+capacity issue, not a Terraform configuration error. Spot VMs have additional capacity constraints compared to regular VMs.
+
+Note:
+A random resource constraint (computer_name length) was identified and fixed by reducing random_string.name length from 8 to 6 characters.
+This fix was documented in random_fix.log.
+
+Conclusion:
+The test case cannot proceed due to Azure capacity limitations for the Standard_F2 Spot VM SKU in the eastus region.
+This test should be marked as 'invalid' as it cannot validate the baseline AzureRM configuration.

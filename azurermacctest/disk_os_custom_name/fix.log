@@ -1,0 +1,20 @@
+Test Case: disk_os_custom_name
+================================================================================
+
+Initial Error:
+Error: Unsupported attribute
+│
+│   on azapi.tf line 45, in resource "azapi_resource" "this":
+│   45:     for_each = can(module.replicator.azapi_header.identity) ? [module.replicator.identity] : []
+│     ├────────────────
+│     │ module.replicator is object with 8 attributes
+│
+│ This object does not have an attribute named "identity".
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: The azapi.tf references module.replicator.identity which doesn't exist as a separate output. However, identity IS included in the azapi_header output (checked migrate_main.tf line 522-525). This is a case of redundant output anti-pattern from common_terraform_error.md section 3. Also, the identity field structure needs to be corrected - the azapi_header uses userAssignedIdentities (Azure API format) not identity_ids (Terraform format).
+- Fix Method: 1) Change module.replicator.identity to module.replicator.azapi_header.identity to use the canonical path, 2) Change can() check to != null check since identity can be null, 3) Fix identity_ids mapping to use userAssignedIdentities keys
+- Changes Made: In azapi.tf line 45-48, changed the identity dynamic block to check for null and properly map userAssignedIdentities
+- Result: Success - plan shows only acceptable drifts (resource-level attributes and computed default values)

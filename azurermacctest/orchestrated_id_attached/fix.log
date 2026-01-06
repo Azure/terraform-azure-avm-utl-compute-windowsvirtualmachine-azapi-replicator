@@ -1,0 +1,23 @@
+Test Case: orchestrated_id_attached
+================================================================================
+
+Initial Error:
+Error: Attempt to get attribute from null value
+
+  on azapi.tf line 49, in resource "azapi_resource" "this":
+  49:       type         = identity.value.type
+     ├────────────────
+     │ identity.value is null
+
+This value is null, so it does not have any attributes.
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: The dynamic identity block uses can() to check if module.replicator.azapi_header.identity exists, but can() evaluates the expression and when identity is null, identity.value.type still tries to access null attributes.
+- Fix Method: Replace can() with a proper null check using != null
+- Changes Made: Changed line 47 from `for_each = can(module.replicator.azapi_header.identity) ? [module.replicator.azapi_header.identity] : []` to `for_each = module.replicator.azapi_header.identity != null ? [module.replicator.azapi_header.identity] : []`
+- Result: Success - Plan now shows acceptable drifts only (resource-level attributes like ignore_null_property, locks, type, etc.)
+
+Final Result: Fix successful
+

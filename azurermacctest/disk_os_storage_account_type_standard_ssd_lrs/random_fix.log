@@ -1,0 +1,4 @@
+Test Case: disk_os_storage_account_type_standard_ssd_lrs
+Error: unable to assume default computer name "computer_name" can be at most 15 characters, got 17. Please adjust the `name`, or specify an explicit `computer_name`
+Fix: Changed random_string.name length from 8 to 6 in main.tf (line 35), so that acctestvm + 6 chars = 15 chars total
+Result: Success

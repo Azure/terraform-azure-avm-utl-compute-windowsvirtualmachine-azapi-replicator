@@ -1,0 +1,11 @@
+Test Case: other_os_image_notification
+================================================================================
+
+Error: unable to assume default computer name "computer_name" can be at most 15 characters, got 17
+
+Fix: Adjusted random_string length from 8 to 6 in main.tf
+- VM name pattern: acctestvm${random_string.name.result}
+- Original: 9 chars + 8 chars = 17 chars (exceeds 15 char limit)
+- Fixed: 9 chars + 6 chars = 15 chars (within limit)
+
+Result: Success

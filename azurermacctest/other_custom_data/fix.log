@@ -1,0 +1,23 @@
+Test Case: other_custom_data
+================================================================================
+
+Initial Error:
+Error: Missing required argument
+on azapi.tf line 1, in module "replicator":
+The argument "resource_group_name" is required, but no definition was found.
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: The module requires resource_group_name but azapi.tf only provided resource_group_id
+- Fix Method: Added resource_group_name = azurerm_resource_group.test.name to module parameters
+- Changes Made: Added line "resource_group_name = azurerm_resource_group.test.name" in azapi.tf module block
+- Result: New error - identity.value is null
+
+Attempt 2:
+- Problem Analysis: The identity dynamic block tries to access null value. Need to add null check
+- Fix Method: Modified for_each condition to check both can() and != null
+- Changes Made: Changed "for_each = can(module.replicator.azapi_header.identity) ? [...]" to "for_each = can(module.replicator.azapi_header.identity) && module.replicator.azapi_header.identity != null ? [...]"
+- Result: Plan succeeded with acceptable drift (resource-level attributes and Optional+Computed fields)
+
+Final Result: Fix successful - drift is acceptable per acceptable_drift_patterns.md

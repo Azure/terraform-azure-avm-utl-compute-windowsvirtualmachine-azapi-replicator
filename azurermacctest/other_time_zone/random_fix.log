@@ -1,0 +1,1 @@
+Test Case: other_time_zone | Error: computer name cannot be more than 15 characters (got 17 from default vm name) | Fix: Reduced random_string length from 8 to 6 characters (acctestvm + 6 chars = 14 chars total) | Result: Retrying apply

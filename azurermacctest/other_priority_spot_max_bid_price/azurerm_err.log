@@ -1,0 +1,24 @@
+Test Case: other_priority_spot_max_bid_price
+================================================================================
+
+Step 2 Failed - AzureRM Baseline Validation
+
+Failed Command: terraform apply -auto-approve -input=false
+
+Error Message:
+Error: creating Windows Virtual Machine (Subscription: "f7a632a5-49db-4c5e-9828-cd62cb753971"
+Resource Group Name: "acctestRG-303471"
+Virtual Machine Name: "acctestvm4mkuv"): performing CreateOrUpdate: unexpected status 409 (409 Conflict) with error: SkuNotAvailable: The requested VM size for resource 'Following SKUs have failed for Capacity Restrictions: Standard_F2' is currently not available in location 'eastus'. Please try another size or deploy to a different location or different zone. See https://aka.ms/azureskunotavailable for details.
+
+Root Cause Analysis:
+- Azure capacity constraint: Standard_F2 VM size is not available in eastus region
+- This is an infrastructure limitation, not a test framework or module issue
+- This is a Spot Priority VM with max_bid_price set to 0.5
+- Spot VMs are subject to capacity availability and eviction policies
+
+Note:
+Fixed random_string length from 8 to 5 to satisfy computer name constraint (≤15 characters).
+However, deployment still failed due to capacity constraints.
+
+Conclusion:
+Test case is invalid due to Azure capacity constraints for Standard_F2 Spot VMs in eastus region.

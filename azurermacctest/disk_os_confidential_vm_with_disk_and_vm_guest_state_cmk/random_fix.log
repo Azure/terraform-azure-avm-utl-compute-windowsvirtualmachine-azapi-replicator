@@ -1,0 +1,5 @@
+Test Case: disk_os_confidential_vm_with_disk_and_vm_guest_state_cmk
+Error: unable to assume default computer name "computer_name" can be at most 15 characters, got 17
+Fix: Reduced random_string length from 8 to 6 characters (acctestvm + 6 chars = 15 chars)
+Additional Fix: Destroyed and recreated disk_encryption_set due to Key Vault change causing access policy dependency issue
+Result: Success

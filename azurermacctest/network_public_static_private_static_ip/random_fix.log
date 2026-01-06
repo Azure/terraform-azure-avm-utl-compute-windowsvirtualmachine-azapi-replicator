@@ -1,0 +1,1 @@
+Test Case: network_public_static_private_static_ip | Error: computer name cannot be more than 15 characters | Fix: Changed random_string length from 8 to 6 in main.tf | Result: Success

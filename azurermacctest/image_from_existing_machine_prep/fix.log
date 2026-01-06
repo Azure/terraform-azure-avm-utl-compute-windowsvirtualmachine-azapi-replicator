@@ -1,0 +1,24 @@
+Test Case: image_from_existing_machine_prep
+================================================================================
+
+Initial Error:
+Error: Missing required argument
+  on azapi.tf line 1, in module "replicator":
+   1: module "replicator" {
+The argument "resource_group_id" is required, but no definition was found.
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: The azapi.tf module call is missing the required resource_group_id parameter
+- Fix Method: Add resource_group_id = azurerm_resource_group.test.id to the module call
+- Changes Made: Added line "resource_group_id = azurerm_resource_group.test.id" after resource_group_name in azapi.tf
+- Result: New error - identity block trying to access null value
+
+Attempt 2:
+- Problem Analysis: The identity dynamic block in azapi_resource.this has incorrect null check logic
+- Fix Method: Add additional null check to the for_each condition
+- Changes Made: Changed for_each from "can(module.replicator.azapi_header.identity) ? [...]" to "can(module.replicator.azapi_header.identity) && module.replicator.azapi_header.identity != null ? [...]"
+- Result: Plan succeeded with acceptable drift patterns (all changes match acceptable_drift_patterns.md Section 1 and 2)
+
+Final Result: Fix successful

@@ -1,0 +1,23 @@
+Test Case: network_multiple
+================================================================================
+
+Initial Error:
+Error: Unsupported attribute
+  on azapi.tf line 45, in resource "azapi_resource" "this":
+  45:     for_each = can(module.replicator.azapi_header.identity) ? [module.replicator.identity] : []
+This object does not have an attribute named "identity".
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: The code was checking for `module.replicator.azapi_header.identity` but then trying to use `module.replicator.identity` which doesn't exist. The identity attribute is nested within the azapi_header output.
+- Fix Method: Changed line 45 from `[module.replicator.identity]` to `[module.replicator.azapi_header.identity]` to match the correct output path.
+- Changes Made: Modified azapi.tf line 45 to use the correct path to the identity attribute
+- Result: New error - "Attempt to get attribute from null value" on line 47
+
+Attempt 2:
+- Problem Analysis: The `can()` function only checks if an attribute exists, not whether it's null. When identity is not configured, azapi_header.identity exists but is null, so the for_each creates an iteration with a null value.
+- Fix Method: Added null check to the condition: `can(module.replicator.azapi_header.identity) && module.replicator.azapi_header.identity != null`
+- Changes Made: Modified azapi.tf line 45 to include null check
+- Result: Testing now...
+

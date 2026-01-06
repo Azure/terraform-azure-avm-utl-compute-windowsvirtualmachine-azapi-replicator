@@ -1,0 +1,26 @@
+Test Case: other_skip_shutdown_and_force_delete
+================================================================================
+
+Initial Error:
+Error: Missing required argument
+
+  on azapi.tf line 1, in module "replicator":
+   1: module "replicator" {
+
+The argument "resource_group_name" is required, but no definition was found.
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: azapi.tf line 4 uses resource_group_id but module expects BOTH resource_group_id AND resource_group_name
+- Fix Method: Keep resource_group_id and add resource_group_name parameter
+- Changes Made: Added line: resource_group_name = azurerm_resource_group.test.name
+- Result: Success - resolved the missing required argument error, but revealed new error about identity being null
+
+Attempt 2:
+- Problem Analysis: Error in azapi.tf line 45 - identity.value is null when trying to access identity.value.type
+- Fix Method: Change identity dynamic block condition from can() to != null
+- Changes Made: Line 43: for_each = can(module.replicator.azapi_header.identity) ? ... -> for_each = module.replicator.azapi_header.identity != null ? ...
+- Result: Success - plan succeeded with acceptable drift patterns only
+
+Final Result: Fix successful

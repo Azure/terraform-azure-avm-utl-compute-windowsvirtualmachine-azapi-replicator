@@ -1,0 +1,5 @@
+Test Case: disk_os_ephemeral_spot
+Error: computer_name cannot be more than 15 characters, got 17
+Fix: Reduced random_string length from 8 to 6 (acctestvm=9 chars + 6 = 15 chars)
+Result: Retrying apply
+

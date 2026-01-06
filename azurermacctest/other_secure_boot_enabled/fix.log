@@ -1,0 +1,27 @@
+Test Case: other_secure_boot_enabled
+================================================================================
+
+Initial Error:
+Missing required argument - The argument "resource_group_name" is required, but no definition was found.
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: azapi.tf uses resource_group_id but module requires resource_group_name
+- Fix Method: Change resource_group_id to resource_group_name and pass azurerm_resource_group.test.name instead of .id
+- Changes Made: Updated azapi.tf line 4 from resource_group_id to resource_group_name, changed value from azurerm_resource_group.test.id to azurerm_resource_group.test.name
+- Result: Failed - now missing resource_group_id
+
+Attempt 2:
+- Problem Analysis: Module requires BOTH resource_group_name and resource_group_id (checked migrate_variables.tf and other fix.log files)
+- Fix Method: Add resource_group_id parameter back alongside resource_group_name
+- Changes Made: Added resource_group_id = azurerm_resource_group.test.id after resource_group_name in azapi.tf
+- Result: Failed - identity attribute not found in module outputs
+
+Attempt 3:
+- Problem Analysis: azapi.tf references module.replicator.identity but no identity block in original azurerm.tf, module has no identity output
+- Fix Method: Remove dynamic identity block from azapi_resource since identity is not used
+- Changes Made: Removed lines 43-49 (dynamic identity block) from azapi.tf
+- Result: Success - plan shows acceptable drifts only (ignore_null_property, locks, replace_triggers_external_values, sensitive_body_version, output, type API version), apply succeeded, second plan shows no changes
+
+Final Result: Fix successful

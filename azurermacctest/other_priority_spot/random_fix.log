@@ -1,0 +1,9 @@
+Test Case: other_priority_spot
+
+Error: unable to assume default computer name "computer_name" can be at most 15 characters, got 17. Please adjust the `name`, or specify an explicit `computer_name`
+
+Fix: Reduced random_string.name length from 8 to 6 characters in main.tf
+- Original: length = 8 (resulted in 17 char VM name: "acctestvm" + 8 chars)
+- Fixed: length = 6 (results in 15 char VM name: "acctestvm" + 6 chars)
+
+Result: Random resource fix successful, but subsequent SKU capacity error occurred

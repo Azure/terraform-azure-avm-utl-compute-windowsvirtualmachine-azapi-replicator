@@ -1,0 +1,1 @@
+Test Case: other_gallery_application_updated | Error: computer_name can be at most 15 characters, got 17 | Fix: Changed random_string length from 8 to 5 (acctestvm + 5 chars = 15 chars) | Result: Retrying apply

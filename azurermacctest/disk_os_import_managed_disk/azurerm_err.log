@@ -1,0 +1,39 @@
+Test Case: disk_os_import_managed_disk
+================================================================================
+
+Test Status: INVALID - Cannot be tested standalone
+
+Root Cause Analysis:
+This test case is designed as part of a multi-step test sequence in the original AzureRM provider test suite. It cannot function as a standalone test case.
+
+Original Test Sequence (from windows_virtual_machine_resource_disk_os_test.go line 388-420):
+1. Step 1: Create a VM with delete_os_disk_on_deletion = false using diskOSBasicNoDelete()
+2. Step 2: Import step
+3. Step 3: Remove the VM using osDiskImportTemplateWithProvider() - VM deleted, disk remains
+4. Step 4: Create new VM importing existing managed disk using diskOSImportManagedDisk()
+5. Step 5: Import step
+6. Step 6: Update with diskOSImportManagedDiskUpdate() to enable delete_os_disk_on_deletion
+7. Step 7: Import step
+
+The extracted configuration (azurerm.tf) contains only Step 4's configuration which expects:
+- A resource group to already exist
+- A managed disk to already exist in that resource group
+- The data source data.azurerm_managed_disks.test to find that existing disk
+
+Error During Step 2 Apply:
+```
+Error: Invalid index
+
+  on azurerm.tf line 10, in resource "azurerm_windows_virtual_machine" "test":
+  10:   os_managed_disk_id = data.azurerm_managed_disks.test.disk.0.id
+    ├────────────────
+    │ data.azurerm_managed_disks.test.disk is empty list of object
+
+The given key does not identify an element in this collection value: the collection has no elements.
+```
+
+Conclusion:
+This test case requires a pre-existing managed OS disk from a previous VM that was deleted while preserving its disk. It cannot be tested in isolation as extracted. The test case extraction process did not capture the dependency on previous test steps.
+
+Recommendation:
+Mark as invalid. This test validates the ability to attach an existing managed disk to a new VM, which is a valid AzureRM feature, but the test setup requires manual preparation or modification to work standalone.

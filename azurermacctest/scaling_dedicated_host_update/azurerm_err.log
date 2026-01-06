@@ -1,0 +1,35 @@
+Test Case: scaling_dedicated_host_update
+================================================================================
+
+Step 2 Failed - AzureRM Baseline Validation Failed
+
+Failed Command:
+terraform apply -auto-approve -input=false
+
+Error:
+Creating Dedicated Host failed with quota exceeded error:
+
+Operation could not be completed as it results in exceeding approved standardDSv3Family Cores quota. 
+Additional details:
+- Deployment Model: Resource Manager
+- Location: eastus
+- Current Limit: 65 cores
+- Current Usage: 0 cores
+- Additional Required: 80 cores (40 cores per dedicated host × 2 hosts)
+- (Minimum) New Limit Required: 80 cores
+
+Root Cause Analysis:
+The test case requires creating two dedicated hosts of SKU "DSv3-Type3" (azurerm_dedicated_host.test and azurerm_dedicated_host.second).
+Each DSv3-Type3 dedicated host requires 40 cores, totaling 80 cores.
+The subscription has a quota limit of 65 cores for standardDSv3Family in the eastus region.
+
+This is NOT a configuration issue that can be fixed by adjusting random resource lengths or parameters.
+This is a fundamental Azure subscription quota limitation.
+
+Conclusion:
+The test case is marked as INVALID because it cannot be executed in the current subscription without increasing the quota.
+This test requires Azure subscription quota increase for standardDSv3Family from 65 to at least 80 cores in the eastus region.
+
+Cleanup:
+Successfully destroyed all partially created resources (resource group, network infrastructure, dedicated host group).
+No orphaned resources remaining.

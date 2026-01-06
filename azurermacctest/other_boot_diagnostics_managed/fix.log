@@ -1,0 +1,30 @@
+Test Case: other_boot_diagnostics_managed
+================================================================================
+
+Initial Error:
+Error: Attempt to get attribute from null value
+
+  on azapi.tf line 49, in resource "azapi_resource" "this":
+  49:       type         = identity.value.type
+    ├────────────────
+    │ identity.value is null
+
+This value is null, so it does not have any attributes.
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: The dynamic identity block is iterating even when identity is null. The can() function returns true even for null values.
+- Fix Method: Add an additional null check to the for_each condition
+- Changes Made: Changed for_each from `can(module.replicator.azapi_header.identity) ? [module.replicator.azapi_header.identity] : []` to `can(module.replicator.azapi_header.identity) && module.replicator.azapi_header.identity != null ? [module.replicator.azapi_header.identity] : []`
+- Result: Success - plan now works
+
+Persistent Drift After Apply:
+- Issue: After apply, plan continues to show drift: `enabled = true -> "true"` in boot_diagnostics
+- Analysis: Module is generating boolean `true` but Azure API expects/returns string `"true"`
+- This is a type mismatch in module implementation
+- Drift does not converge after multiple apply cycles
+- This violates the idempotency requirement for Step 3
+
+Final Result: Fix partially successful - identity error resolved but persistent type mismatch drift remains
+

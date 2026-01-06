@@ -1,0 +1,41 @@
+Test Case: scaling_dedicated_host_group_initial
+================================================================================
+
+Initial Error:
+Error: Missing required argument
+The argument "resource_group_id" is required, but no definition was found.
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: The module call in azapi.tf was using resource_group_name instead of resource_group_id
+- Fix Method: Replace resource_group_name = azurerm_resource_group.test.name with resource_group_id = azurerm_resource_group.test.id
+- Changes Made: Changed parameter from resource_group_name to resource_group_id in azapi.tf line 5
+- Result: Failed - Now missing resource_group_name
+
+Attempt 2:
+- Problem Analysis: Both resource_group_id and resource_group_name are required by the module
+- Fix Method: Add both resource_group_id and resource_group_name parameters
+- Changes Made: Added both resource_group_id = azurerm_resource_group.test.id and resource_group_name = azurerm_resource_group.test.name
+- Result: Failed - admin_password_version is required when admin_password is set
+
+Attempt 3:
+- Problem Analysis: The module requires admin_password_version when admin_password is provided
+- Fix Method: Add admin_password_version = 1 parameter
+- Changes Made: Added admin_password_version = 1 to module call
+- Result: Failed - module.replicator.identity does not exist
+
+Attempt 4:
+- Problem Analysis: The azapi_resource block was referencing module.replicator.identity instead of module.replicator.azapi_header.identity
+- Fix Method: Fix the identity dynamic block to use correct reference
+- Changes Made: Changed module.replicator.identity to module.replicator.azapi_header.identity in line 44
+- Result: Failed - identity value is null, need to use != null instead of can()
+
+Attempt 5:
+- Problem Analysis: The for_each condition used can() which doesn't properly check for null values
+- Fix Method: Replace can() with != null check as used in working test cases
+- Changes Made: Changed for_each condition from can(module.replicator.azapi_header.identity) to module.replicator.azapi_header.identity != null
+- Result: Success - Plan shows acceptable drifts (resource-level attributes and computed default values)
+
+Final Result: Fix successful - All drifts are acceptable per acceptable_drift_patterns.md
+

@@ -1,0 +1,23 @@
+Test Case: identity_system_assigned_user_assigned
+================================================================================
+
+Initial Error:
+creating/updating Resource: creating/updating Resource: (ResourceId "/subscriptions/f7a632a5-49db-4c5e-9828-cd62cb753971/resourceGroups/acctestRG-428984/providers/Microsoft.Compute/virtualMachines/acctestvmt7da2" / Api Version "2024-03-01"): PUT https://management.azure.com/subscriptions/f7a632a5-49db-4c5e-9828-cd62cb753971/resourceGroups/acctestRG-428984/providers/Microsoft.Compute/virtualMachines/acctestvmt7da2
+RESPONSE 400: 400 Bad Request
+ERROR CODE: MissingIdentityIds
+{
+  "error": {
+    "code": "MissingIdentityIds",
+    "message": "The identity ids must not be null or empty for 'UserAssigned' identity type."
+  }
+}
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: The module's azapi_header.identity was outputting `userAssignedIdentities` instead of `identity_ids`. The azapi_resource's identity block expects `identity_ids` attribute, not `userAssignedIdentities`.
+- Fix Method: Changed migrate_main.tf line 524 from `userAssignedIdentities = var.identity.identity_ids != null ? { for id in var.identity.identity_ids : id => {} } : null` to `identity_ids = var.identity.identity_ids != null ? tolist(var.identity.identity_ids) : null`
+- Changes Made: In migrate_main.tf, modified the azapi_header.identity structure to use identity_ids instead of userAssignedIdentities
+- Result: Success
+
+Final Result: Fix successful

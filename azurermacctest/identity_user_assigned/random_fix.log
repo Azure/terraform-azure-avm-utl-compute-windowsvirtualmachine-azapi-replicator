@@ -1,0 +1,1 @@
+Test Case: identity_user_assigned | Error: computer name "acctestvm" (9 chars) + 8 random chars = 17 chars exceeds 15 char limit | Fix: Changed random_string length from 8 to 6 | Result: Success

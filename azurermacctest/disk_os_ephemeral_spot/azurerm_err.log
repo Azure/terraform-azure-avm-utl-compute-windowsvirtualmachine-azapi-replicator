@@ -1,0 +1,23 @@
+Test Case: disk_os_ephemeral_spot
+================================================================================
+
+Step 2 Failed: AzureRM baseline validation
+
+Initial Error (Computer Name Length):
+Error: unable to assume default computer_name "computer_name" can be at most 15 characters, got 17. Please adjust the `name`, or specify an explicit `computer_name`
+
+Fix Applied:
+Reduced random_string length from 8 to 6 (acctestvm=9 chars + 6 = 15 chars)
+Result: Fixed computer name issue
+
+Final Error (Quota Exceeded):
+Error: creating Windows Virtual Machine: unexpected status 409 (409 Conflict) with error: OperationNotAllowed: Operation could not be completed as it results in exceeding approved LowPriorityCores quota. Additional details - Deployment Model: Resource Manager, Location: eastus, Current Limit: 3, Current Usage: 0, Additional Required: 4, (Minimum) New Limit Required: 4.
+
+Root Cause Analysis:
+The test case requires a Spot VM (priority = "Spot") with size Standard_DS3_v2 (4 vCPUs), but the subscription only has a quota of 3 Low Priority Cores in eastus region. This is a subscription quota limitation, not a test configuration issue.
+
+Failed Command:
+terraform apply -auto-approve -input=false
+
+Conclusion:
+This test case cannot be executed due to insufficient Low Priority (Spot) VM quota in the subscription. The test case should be marked as "invalid" as it cannot proceed past Step 2 baseline validation.

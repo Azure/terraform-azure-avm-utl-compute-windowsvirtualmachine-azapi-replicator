@@ -1,0 +1,30 @@
+Test Case: other_allow_extension_operations_disabled_without_vm_agent
+================================================================================
+
+Initial Error:
+Error: Attempt to get attribute from null value
+  on azapi.tf line 49, in resource "azapi_resource" "this":
+  49:       type         = identity.value.type
+    ├────────────────
+    │ identity.value is null
+This value is null, so it does not have any attributes.
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: The identity dynamic block uses can() to check if identity exists, but can() returns true even when the value is null. When identity is null, accessing identity.value.type fails.
+- Fix Method: Added additional check 'module.replicator.azapi_header.identity != null' to the for_each condition
+- Changes Made: Changed for_each condition from 'can(module.replicator.azapi_header.identity) ? [module.replicator.azapi_header.identity] : []' to 'can(module.replicator.azapi_header.identity) && module.replicator.azapi_header.identity != null ? [module.replicator.azapi_header.identity] : []'
+- Result: Retrying plan
+
+
+Attempt 1 Result: Fix successful - plan now succeeds
+
+Evaluating Drift:
+- All changes are in AzAPI resource-level attributes (ignore_null_property, locks, replace_triggers_external_values, sensitive_body_version, output, type) - ACCEPTABLE per Pattern #1
+- Body structure changes appear to be Optional+Computed fields (bootDiagnostics.storageUri, licenseType, requireGuestProvisionSignal, secrets, patchSettings, winRM, priority, deleteOption, diskSizeGB, managedDisk.id/name) - likely ACCEPTABLE per Pattern #2
+- No resource recreation, no explicitly configured values differ
+- Applying to verify idempotency
+
+
+Final Result: Fix successful - Second plan shows no changes (idempotency verified)
