@@ -1,0 +1,20 @@
+Test Case: orchestrated_zonal_with_proximity_placement_group
+================================================================================
+
+Initial Error:
+Error: Missing required argument
+The argument "resource_group_name" is required, but no definition was found.
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: The azapi.tf module call was using `resource_group_id = azurerm_resource_group.test.id` instead of the correct parameter name. The original azurerm.tf uses `resource_group_name = azurerm_resource_group.test.name` (line 3)
+- Fix Method: Changed module parameter from `resource_group_id` to `resource_group_name` and used `.name` instead of `.id`
+- Changes Made: Line 5 in azapi.tf: `resource_group_id = azurerm_resource_group.test.id` -> `resource_group_name = azurerm_resource_group.test.name`
+- Result: Failed - Now module requires resource_group_id
+
+Attempt 2:
+- Problem Analysis: The module requires BOTH resource_group_id AND resource_group_name parameters (confirmed by checking other test cases with resource_group_id pattern)
+- Fix Method: Add both parameters - resource_group_name for the AVM interface and resource_group_id for internal azapi usage
+- Changes Made: Added line 5: `resource_group_id = azurerm_resource_group.test.id` before resource_group_name
+- Result: Retrying terraform plan

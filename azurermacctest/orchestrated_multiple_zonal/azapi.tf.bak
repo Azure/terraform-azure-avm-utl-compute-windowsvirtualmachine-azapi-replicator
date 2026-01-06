@@ -1,0 +1,127 @@
+module "replicator_test" {
+  source = "../.."
+
+  name                   = "accVM1${random_integer.number.result}"
+  resource_group_name    = azurerm_resource_group.test.name
+  resource_group_id      = azurerm_resource_group.test.id
+  location               = azurerm_resource_group.test.location
+  size                   = "Standard_F2"
+  admin_username         = "adminuser"
+  admin_password         = "P@ssw0rd1234!"
+  admin_password_version = 1
+  network_interface_ids = [
+    azurerm_network_interface.first.id,
+  ]
+
+  source_image_reference = {
+    publisher = "MicrosoftWindowsServer"
+    offer     = "WindowsServer"
+    sku       = "2016-Datacenter"
+    version   = "latest"
+  }
+
+  os_disk = {
+    storage_account_type = "Standard_LRS"
+    caching              = "ReadWrite"
+  }
+
+  virtual_machine_scale_set_id = azurerm_orchestrated_virtual_machine_scale_set.test.id
+  zone                         = tolist(azurerm_orchestrated_virtual_machine_scale_set.test.zones)[0]
+}
+
+resource "azapi_resource" "test" {
+  type                             = module.replicator_test.azapi_header.type
+  name                             = module.replicator_test.azapi_header.name
+  location                         = module.replicator_test.azapi_header.location
+  parent_id                        = module.replicator_test.azapi_header.parent_id
+  tags                             = module.replicator_test.azapi_header.tags
+  body                             = module.replicator_test.body
+  ignore_null_property             = module.replicator_test.azapi_header.ignore_null_property
+  sensitive_body                   = module.replicator_test.sensitive_body
+  sensitive_body_version           = module.replicator_test.sensitive_body_version
+  replace_triggers_external_values = module.replicator_test.replace_triggers_external_values
+  locks                            = module.replicator_test.locks
+  retry                            = module.replicator_test.retry
+
+  dynamic "identity" {
+    for_each = try(module.replicator_test.azapi_header.identity, null) != null ? [module.replicator_test.azapi_header.identity] : []
+    content {
+      type         = identity.value.type
+      identity_ids = try(identity.value.identity_ids, null)
+    }
+  }
+
+  dynamic "timeouts" {
+    for_each = module.replicator_test.timeouts != null ? [module.replicator_test.timeouts] : []
+    content {
+      create = timeouts.value.create
+      delete = timeouts.value.delete
+      read   = timeouts.value.read
+      update = timeouts.value.update
+    }
+  }
+}
+
+module "replicator_another" {
+  source = "../.."
+
+  name                   = "accVM2${random_integer.number.result}"
+  resource_group_name    = azurerm_resource_group.test.name
+  resource_group_id      = azurerm_resource_group.test.id
+  location               = azurerm_resource_group.test.location
+  size                   = "Standard_F2"
+  admin_username         = "adminuser"
+  admin_password         = "P@ssw0rd1234!"
+  admin_password_version = 1
+  network_interface_ids = [
+    azurerm_network_interface.second.id,
+  ]
+
+  source_image_reference = {
+    publisher = "MicrosoftWindowsServer"
+    offer     = "WindowsServer"
+    sku       = "2019-Datacenter"
+    version   = "latest"
+  }
+
+  os_disk = {
+    storage_account_type = "Standard_LRS"
+    caching              = "ReadWrite"
+  }
+
+  virtual_machine_scale_set_id = azurerm_orchestrated_virtual_machine_scale_set.test.id
+  zone                         = tolist(azurerm_orchestrated_virtual_machine_scale_set.test.zones)[0]
+}
+
+resource "azapi_resource" "another" {
+  type                             = module.replicator_another.azapi_header.type
+  name                             = module.replicator_another.azapi_header.name
+  location                         = module.replicator_another.azapi_header.location
+  parent_id                        = module.replicator_another.azapi_header.parent_id
+  tags                             = module.replicator_another.azapi_header.tags
+  body                             = module.replicator_another.body
+  ignore_null_property             = module.replicator_another.azapi_header.ignore_null_property
+  sensitive_body                   = module.replicator_another.sensitive_body
+  sensitive_body_version           = module.replicator_another.sensitive_body_version
+  replace_triggers_external_values = module.replicator_another.replace_triggers_external_values
+  locks                            = module.replicator_another.locks
+  retry                            = module.replicator_another.retry
+
+  dynamic "identity" {
+    for_each = try(module.replicator_another.azapi_header.identity, null) != null ? [module.replicator_another.azapi_header.identity] : []
+    content {
+      type         = identity.value.type
+      identity_ids = try(identity.value.identity_ids, null)
+    }
+  }
+
+  dynamic "timeouts" {
+    for_each = module.replicator_another.timeouts != null ? [module.replicator_another.timeouts] : []
+    content {
+      create = timeouts.value.create
+      delete = timeouts.value.delete
+      read   = timeouts.value.read
+      update = timeouts.value.update
+    }
+  }
+}

@@ -1,0 +1,14 @@
+Test Case: orchestrated_zonal
+================================================================================
+
+Initial Error:
+unable to assume default computer name "computer_name" can be at most 15 characters, got 17. Please adjust the `name`, or specify an explicit `computer_name`
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: The vm_name is "acctestvm" (9 chars) + random_string (8 chars) = 17 characters total, exceeding the 15 character Windows computer name limit
+- Fix Method: Reduce random_string length from 8 to 6 characters to make total length 15 characters (9 + 6 = 15)
+- Changes Made: Modified main.tf random_string.name length from 8 to 6
+- Result: Success
+

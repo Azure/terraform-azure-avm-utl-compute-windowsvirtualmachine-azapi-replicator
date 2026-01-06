@@ -1,0 +1,4 @@
+Test Case: disk_os_confidential_vm_with_guest_state_only
+Error: unable to assume default computer name "computer_name" can be at most 15 characters, got 17
+Fix: Changed random_string length from 8 to 5 in main.tf (acctestvm prefix + 5 chars = 15 total)
+Result: Retrying apply

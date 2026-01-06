@@ -1,0 +1,32 @@
+Test Case: other_patch_mode_automatic_by_platform
+================================================================================
+
+Initial Error:
+Error: Unsupported attribute
+  on azapi.tf line 46, in resource "azapi_resource" "this":
+  46:     for_each = can(module.replicator.azapi_header.identity) ? [module.replicator.identity] : []
+This object does not have an attribute named "identity".
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: The error indicates module.replicator.identity doesn't exist. This is pattern #3 from common_terraform_error.md - Redundant Module Outputs. The identity data is already inside azapi_header.
+- Fix Method: Changed reference from module.replicator.identity to module.replicator.azapi_header.identity. Also fixed identity_ids field name to match Azure API (userAssignedIdentities) and convert to keys list.
+- Changes Made: 
+  1. Line 46: [module.replicator.identity] -> [module.replicator.azapi_header.identity]
+  2. Line 49: identity.value.identity_ids -> keys(identity.value.userAssignedIdentities) with null check
+- Result: Retrying terraform plan
+
+Attempt 2:
+- Problem Analysis: The for_each condition uses can() which doesn't properly handle null values. The identity is null for this test case (no identity block in azurerm.tf).
+- Fix Method: Changed from can() to try() with null check to properly handle when identity is null.
+- Changes Made: Line 46: can(module.replicator.azapi_header.identity) -> try(module.replicator.azapi_header.identity, null) != null
+- Result: Retrying terraform plan
+
+Final Result: Fix successful
+
+All drifts observed are acceptable according to acceptable_drift_patterns.md:
+- Resource-level attributes (ignore_null_property, locks, output, replace_triggers_external_values, sensitive_body_version, type) - Section 1
+- Body changes appear to be computed defaults being removed due to ignore_null_property = true - Section 2
+
+Proceeding to apply changes and verify idempotency.

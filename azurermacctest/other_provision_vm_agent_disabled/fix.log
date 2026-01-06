@@ -1,0 +1,22 @@
+Test Case: other_provision_vm_agent_disabled
+================================================================================
+
+Initial Error:
+Error: Attempt to get attribute from null value
+
+  on azapi.tf line 49, in resource "azapi_resource" "this":
+  49:       type         = identity.value.type
+     ├────────────────
+     │ identity.value is null
+
+This value is null, so it does not have any attributes.
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: The can() function check for identity block is still allowing null values through to for_each
+- Fix Method: Changed from can() to explicit null check (identity != null)
+- Changes Made: Modified line 47 of azapi.tf: `for_each = module.replicator.azapi_header.identity != null ? [module.replicator.azapi_header.identity] : []`
+- Result: Success
+
+Final Result: Fix successful

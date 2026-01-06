@@ -1,0 +1,24 @@
+Test Case: scaling_zone
+================================================================================
+
+Initial Error:
+Error: Unsupported attribute
+  on azapi.tf line 45, in resource "azapi_resource" "this":
+   45:     for_each = can(module.replicator.azapi_header.identity) ? [module.replicator.identity] : []
+This object does not have an attribute named "identity".
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: The code checks for module.replicator.azapi_header.identity but tries to use module.replicator.identity which doesn't exist. The module doesn't have an identity output directly; identity is nested inside azapi_header output.
+- Fix Method: Changed line 45 from [module.replicator.identity] to [module.replicator.azapi_header.identity]
+- Changes Made: Updated azapi.tf line 45 to correctly reference module.replicator.azapi_header.identity
+- Result: New error - identity.value is null
+
+Attempt 2:
+- Problem Analysis: The for_each condition only checks can() but doesn't check for null value. When identity exists but is null, it tries to iterate with null value.
+- Fix Method: Add null check to the condition - change from `can(module.replicator.azapi_header.identity) ?` to `can(module.replicator.azapi_header.identity) && module.replicator.azapi_header.identity != null ?`
+- Changes Made: Updated azapi.tf line 45 to include null check
+- Result: Success! Plan succeeds with acceptable drift (resource-level attributes and computed defaults being removed).
+
+Final Result: Fix successful

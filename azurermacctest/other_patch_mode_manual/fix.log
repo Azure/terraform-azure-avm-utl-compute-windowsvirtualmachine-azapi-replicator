@@ -1,0 +1,42 @@
+Test Case: other_patch_mode_manual
+================================================================================
+
+Initial Error:
+Error: Missing required argument
+│
+│   on azapi.tf line 1, in module "replicator":
+│    1: module "replicator" {
+│
+│ The argument "resource_group_name" is required, but no definition was found.
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: The azapi.tf uses resource_group_id but the module requires resource_group_name
+- Fix Method: Add resource_group_name parameter to module call
+- Changes Made: Added resource_group_name = azurerm_resource_group.test.name
+- Result: Still failed - now asking for resource_group_id
+
+Attempt 2:
+- Problem Analysis: Module requires BOTH resource_group_name (in variables.tf) and resource_group_id (in migrate_variables.tf)
+- Fix Method: Add both parameters to module call
+- Changes Made: Added resource_group_id = azurerm_resource_group.test.id
+- Result: Progressed - now getting identity attribute error
+
+Attempt 3:
+- Problem Analysis: azapi.tf references module.replicator.identity but identity is inside azapi_header, not a separate output
+- Fix Method: Change reference to module.replicator.azapi_header.identity
+- Changes Made: Updated line 48 in azapi.tf dynamic identity block
+- Result: Still failed - identity.value is null
+
+Attempt 4:
+- Problem Analysis: The dynamic block iterates with identity but tries to access .type on a null value. The azapi_header.identity uses 'userAssignedIdentities' but the azapi_resource expects 'identity_ids'
+- Fix Method: Fix the dynamic block to properly handle identity structure and convert userAssignedIdentities to identity_ids
+- Changes Made: Updated dynamic identity block to check identity.type exists and extract identity_ids from userAssignedIdentities keys
+- Result: Success! Plan completed with acceptable drifts
+
+Final Result: Fix successful
+
+All detected drifts are acceptable per acceptable_drift_patterns.md:
+- Resource-level attributes (ignore_null_property, locks, type, output, etc.) - Pattern 1
+- Body changes removing Optional+Computed fields - Pattern 2

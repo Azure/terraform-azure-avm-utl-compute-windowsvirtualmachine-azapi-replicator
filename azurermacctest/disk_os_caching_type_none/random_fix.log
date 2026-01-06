@@ -1,0 +1,8 @@
+Test Case: disk_os_caching_type_none
+Attempt 1:
+- Problem Analysis: Computer name exceeds 15 character limit (acctestvm + 8 chars = 17)
+- Fix Method: Reduce random_string length from 8 to 6
+- Changes Made: Updated random_string.name length to 6 in main.tf
+- Result: Retrying apply...
+
+- Result: Success

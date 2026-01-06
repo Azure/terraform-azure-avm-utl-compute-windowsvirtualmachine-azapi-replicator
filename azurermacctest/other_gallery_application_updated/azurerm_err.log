@@ -1,0 +1,17 @@
+Test Case: other_gallery_application_updated
+================================================================================
+
+Step 2 failed during apply
+
+Error:
+creating Windows Virtual Machine: performing CreateOrUpdate: unexpected status 409 (409 Conflict) with error: OperationNotAllowed: EnableAutomaticUpgrade cannot be set to true for applications with configurationReference. Please remove configurationReference from application to enable auto-upgrades for it.
+
+Root Cause Analysis:
+The azurerm.tf configuration contains a gallery_application block (line 29-36) with conflicting settings:
+- automatic_upgrade_enabled = true (line 31)
+- configuration_blob_uri is set (line 33)
+
+According to Azure API validation rules, these two properties cannot be set together. This is an Azure platform constraint, not a Terraform provider issue.
+
+Conclusion:
+This test case configuration is INVALID due to Azure API constraints. The azurerm.tf file contains a configuration that violates Azure platform rules. The test case should be marked as 'invalid' rather than attempting to fix it, as the source configuration itself is incompatible with Azure requirements.

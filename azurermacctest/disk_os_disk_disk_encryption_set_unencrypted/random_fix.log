@@ -1,0 +1,16 @@
+Test Case: disk_os_disk_disk_encryption_set_unencrypted
+================================================================================
+
+Initial Error:
+computer name 'acctestvm' + random_string(8 chars) = 17 chars exceeds 15 char limit
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: VM name 'acctestvm' + 8 char random string creates 17 char computer name, exceeding 15 char limit
+- Fix Method: Reduce random_string length from 8 to 6 characters
+- Changes Made: Modified main.tf line 35, changed length = 8 to length = 6
+- Result: Retrying terraform apply...
+- Result: Success
+
+Final Result: Fix successful

@@ -1,0 +1,30 @@
+Test Case: other_patch_mode_automatic_by_os
+================================================================================
+
+Initial Error:
+Error: Unsupported attribute
+  on azapi.tf line 47, in resource "azapi_resource" "this":
+  47:     for_each = can(module.replicator.azapi_header.identity) ? [module.replicator.identity] : []
+This object does not have an attribute named "identity".
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: The code is checking for azapi_header.identity but then trying to reference module.replicator.identity which doesn't exist as a separate output. The identity is part of azapi_header, not a standalone output.
+- Fix Method: Change line 47 from `[module.replicator.identity]` to `[module.replicator.azapi_header.identity]`
+- Changes Made: Edit azapi.tf line 47 to reference the correct path
+- Result: New error - identity.value is null
+
+Attempt 2:
+- Problem Analysis: The azapi_header.identity structure has `userAssignedIdentities` field (as a map), but the azapi_resource identity block expects `identity_ids` (as a list). Need to convert map keys to list.
+- Fix Method: Change line 50 from `try(identity.value.identity_ids, null)` to `try(keys(identity.value.userAssignedIdentities), null)`
+- Changes Made: Updated identity_ids mapping to extract keys from userAssignedIdentities map
+- Result: Still error - identity.value is null even though for_each is iterating
+
+Attempt 3:
+- Problem Analysis: Using `can(module.replicator.azapi_header.identity)` checks if the attribute exists, not if it's non-null. In this test case, identity is null so we shouldn't iterate at all.
+- Fix Method: Change line 47 from `can(module.replicator.azapi_header.identity)` to `module.replicator.azapi_header.identity != null`
+- Changes Made: Updated for_each condition to properly check for null value
+- Result: Success - Plan succeeded with acceptable drifts only
+
+Final Result: Fix successful

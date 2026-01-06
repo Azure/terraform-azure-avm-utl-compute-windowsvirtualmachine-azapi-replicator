@@ -1,0 +1,1 @@
+Test Case: other_encryption_at_host_enabled | Error: computer_name can be at most 15 characters, got 17 | Fix: Reduced random_string length from 8 to 6 | Result: Success

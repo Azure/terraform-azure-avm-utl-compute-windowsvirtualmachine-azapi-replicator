@@ -1,0 +1,25 @@
+Test Case: identity_user_assigned_updated
+================================================================================
+
+Initial Error:
+The argument "resource_group_id" is required, but no definition was found.
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: The module requires resource_group_id parameter which was missing
+- Fix Method: Added resource_group_id = azurerm_resource_group.test.id to module call
+- Changes Made: Added resource_group_id parameter in azapi.tf
+- Result: Revealed second error - admin_password_version validation
+
+Attempt 2:
+- Problem Analysis: When admin_password is set, admin_password_version must also be set per validation rule
+- Fix Method: Added admin_password_version = 1 to module call
+- Changes Made: Added admin_password_version parameter in azapi.tf
+- Result: Success - terraform plan succeeded with acceptable drifts only
+
+Final Result: Fix successful
+
+Note: During Step 2 (baseline validation), encountered computer name length issue.
+Fixed by reducing random_string.length from 8 to 5 in main.tf to ensure VM name
+(acctestvmXXXXX) stays within 15-character limit for Windows computer names.

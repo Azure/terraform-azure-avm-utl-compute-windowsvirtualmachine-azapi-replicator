@@ -1,0 +1,34 @@
+Test Case: network_private_static_ip
+================================================================================
+
+Initial Error:
+Error: Missing required argument
+The argument "resource_group_id" is required, but no definition was found.
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: Module requires resource_group_id parameter but it was missing from the azapi.tf module call
+- Fix Method: Add resource_group_id parameter to module call
+- Changes Made: Added line "resource_group_id = azurerm_resource_group.test.id" after resource_group_name
+- Result: Failure - new error: When admin_password is set, admin_password_version must also be set.
+
+Attempt 2:
+- Problem Analysis: Module validation requires admin_password_version when admin_password is provided
+- Fix Method: Add admin_password_version parameter to module call
+- Changes Made: Added line "admin_password_version = 1" after admin_password
+- Result: Failure - new error: This object does not have an attribute named "identity"
+
+Attempt 3:
+- Problem Analysis: Dynamic identity block referenced wrong module output (module.replicator.identity instead of module.replicator.azapi_header.identity)
+- Fix Method: Correct the reference in dynamic identity block
+- Changes Made: Changed "module.replicator.identity" to "module.replicator.azapi_header.identity"
+- Result: Failure - new error: identity.value is null
+
+Attempt 4:
+- Problem Analysis: Since original azurerm resource has no identity block, the dynamic identity block is unnecessary and causing errors
+- Fix Method: Remove the entire dynamic identity block from azapi_resource
+- Changes Made: Deleted dynamic identity block (lines 41-47)
+- Result: Success - terraform plan shows only acceptable drift patterns (ignore_null_property, locks, replace_triggers_external_values, sensitive_body_version, output, API version, and Azure-provided default values)
+
+Final Result: Fix successful

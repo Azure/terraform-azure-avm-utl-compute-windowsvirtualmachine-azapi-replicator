@@ -1,0 +1,35 @@
+Test Case: other_user_data
+================================================================================
+
+Initial Error:
+Error: Unsupported block type
+  on azapi.tf line 61, in resource "azapi_resource" "this":
+  61:   retry {
+Blocks of type "retry" are not expected here. Did you mean to define argument "retry"? If so, use the equals sign to assign it a value.
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: The retry block syntax is incorrect. The azapi provider expects retry as an argument (object), not a block.
+- Fix Method: Changed retry from a block to an argument using `retry = module.replicator.retry`
+- Changes Made: 
+  1. Replaced the retry block (lines 61-67) with a single line argument: `retry = module.replicator.retry`
+  2. Checked another working test case (disk_os_basic) which confirmed retry should be an argument
+- Result: Testing with terraform plan...
+
+
+Attempt 2:
+- Problem Analysis: The identity dynamic block uses can() instead of != null check. This caused an error when identity.value is null.
+- Fix Method: Changed the for_each condition from can(module.replicator.azapi_header.identity) to module.replicator.azapi_header.identity != null
+- Changes Made: Updated line 44 in azapi.tf
+- Result: Testing with terraform plan...
+
+
+Attempt 2 Result: Success - terraform plan completed without errors
+
+Drift Analysis:
+All detected drifts are acceptable:
+1. Resource-level attributes (ignore_null_property, locks, replace_triggers_external_values, sensitive_body_version, output, type) - All acceptable per acceptable_drift_patterns.md section 1
+2. Body changes - Mostly removals of Optional+Computed fields, plus userData being added (expected for this test)
+
+Final Result: Fix successful

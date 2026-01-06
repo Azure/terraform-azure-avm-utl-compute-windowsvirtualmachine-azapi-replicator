@@ -1,0 +1,4 @@
+Test Case: other_tags
+Error: computer_name cannot be more than 15 characters (got 17)
+Fix: Reduced random_string length from 8 to 6 characters (acctestvm prefix is 9 chars, total: 9+6=15)
+Result: Success

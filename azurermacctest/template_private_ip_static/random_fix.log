@@ -1,0 +1,1 @@
+Test Case: template_private_ip_static | Error: computer name cannot be more than 15 characters (got 17: acctestvm + 8 random chars) | Fix: Changed random_string.name length from 8 to 6 (acctestvm = 9 + 6 = 15 chars total) | Result: Success

@@ -1,0 +1,31 @@
+Test Case: other_secret_removed
+================================================================================
+
+Initial Error:
+Error: Missing required argument on azapi.tf line 1, in module "replicator":
+The argument "resource_group_name" is required, but no definition was found.
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: The azapi.tf module call was using resource_group_id instead of resource_group_name
+- Fix Method: Changed resource_group_id to resource_group_name in azapi.tf line 5
+- Changes Made: resource_group_id = azurerm_resource_group.test.id -> resource_group_name = azurerm_resource_group.test.name
+- Result: Failure - new error shows resource_group_id is also required
+
+Attempt 2:
+- Problem Analysis: The module requires BOTH resource_group_name AND resource_group_id
+- Fix Method: Added resource_group_id parameter alongside resource_group_name
+- Changes Made: Added line 6: resource_group_id = azurerm_resource_group.test.id
+- Result: Failure - Error in identity dynamic block: can() returns true for null value
+
+Attempt 3:
+- Problem Analysis: The identity dynamic block's for_each condition using can() returns true even when value is null
+- Fix Method: Added explicit null check to for_each condition
+- Changes Made: Changed line 43 condition from "can(module.replicator.azapi_header.identity)" to "can(module.replicator.azapi_header.identity) && module.replicator.azapi_header.identity != null"
+- Result: Success - plan shows acceptable drift (AzAPI attributes and Optional+Computed fields)
+
+Final Result: Fix successful
+
+
+

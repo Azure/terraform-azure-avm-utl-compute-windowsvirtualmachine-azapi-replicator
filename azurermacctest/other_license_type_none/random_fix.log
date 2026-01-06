@@ -1,0 +1,1 @@
+Test Case: other_license_type_none | Error: computer name cannot be more than 15 characters | Fix: Changed random_string length from 8 to 6 (acctestvm + 6 = 15 chars) | Result: Success

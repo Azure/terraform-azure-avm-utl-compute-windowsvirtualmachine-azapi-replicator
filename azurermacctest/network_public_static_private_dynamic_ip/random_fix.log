@@ -1,0 +1,4 @@
+Test Case: network_public_static_private_dynamic_ip
+Error: unable to assume default computer name "computer_name" can be at most 15 characters, got 17
+Fix: Changed random_string length from 8 to 6 (acctestvm prefix is 9 chars + 6 random chars = 15 total)
+Result: Success

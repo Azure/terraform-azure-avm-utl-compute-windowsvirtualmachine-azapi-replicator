@@ -1,0 +1,1 @@
+Test Case: other_secret_updated | Error: unable to assume default computer name "computer_name" can be at most 15 characters, got 17 | Fix: Reduced random_string length from 8 to 6 characters (8 char name would create 17 char VM name: acctestvm + 8 chars = 17, exceeded 15 char limit) | Result: Success

@@ -1,0 +1,1 @@
+Test Case: other_patch_mode_automatic_by_platform | Error: computer name cannot be more than 15 characters, got 17 (acctestvm + 8 chars) | Fix: Changed random_string length from 8 to 6 to make total 15 chars (acctestvm + 6 chars) | Result: Success

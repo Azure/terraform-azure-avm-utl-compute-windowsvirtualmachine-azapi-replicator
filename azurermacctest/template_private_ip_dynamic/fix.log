@@ -1,0 +1,24 @@
+Test Case: template_private_ip_dynamic
+================================================================================
+
+Initial Error:
+Error: Unsupported attribute
+  on azapi.tf line 44, in resource "azapi_resource" "this":
+  44:     for_each = can(module.replicator.azapi_header.identity) ? [module.replicator.identity] : []
+This object does not have an attribute named "identity".
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: This is the "Redundant Module Outputs" pattern from common_terraform_error.md. The identity attribute is part of azapi_header composite output, not a separate output.
+- Fix Method: Changed module.replicator.identity to module.replicator.azapi_header.identity to use the canonical path
+- Changes Made: Updated line 44 in azapi.tf from [module.replicator.identity] to [module.replicator.azapi_header.identity]
+- Result: Retrying terraform plan
+
+Attempt 2:
+- Problem Analysis: The identity attribute exists in azapi_header but is null for this VM (no identity configured). can() returns true even for null values, so we need to check != null instead.
+- Fix Method: Changed condition from can(module.replicator.azapi_header.identity) to module.replicator.azapi_header.identity != null
+- Changes Made: Updated line 44 in azapi.tf to use != null check instead of can()
+- Result: Success - plan shows acceptable drifts only
+
+Final Result: Fix successful

@@ -1,0 +1,24 @@
+Test Case: identity_none
+================================================================================
+
+Initial Error:
+Error: Attempt to get attribute from null value
+  on azapi.tf line 46, in resource "azapi_resource" "this":
+  46:       type         = identity.value.type
+This value is null, so it does not have any attributes.
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: The dynamic identity block uses can() which returns true even when identity is null. For identityNone test case, there should be no identity block at all.
+- Fix Method: Changed condition from 'can(module.replicator.azapi_header.identity)' to 'module.replicator.azapi_header.identity != null'
+- Changes Made: Modified line 44 in azapi.tf to properly check for null identity
+- Result: Testing...
+
+
+Drift Analysis:
+All detected drifts match acceptable patterns from acceptable_drift_patterns.md:
+- Resource-level attributes (ignore_null_property, locks, replace_triggers_external_values, sensitive_body_version, output, type): All acceptable per section 1
+- Body changes: All are removed default/computed values from Azure API (Optional+Computed fields) - acceptable per section 2
+
+Final Result: Fix successful - proceeding with apply to verify idempotency

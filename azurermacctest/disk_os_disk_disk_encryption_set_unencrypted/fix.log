@@ -1,0 +1,25 @@
+Test Case: disk_os_disk_disk_encryption_set_unencrypted
+================================================================================
+
+Initial Error:
+Missing required argument 'resource_group_id' in module call
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: Module requires resource_group_id parameter which was missing
+- Fix Method: Add resource_group_id parameter to module call
+- Changes Made: Added resource_group_id = azurerm_resource_group.test.id to azapi.tf module block
+- Result: Retrying terraform plan...
+
+- Result: Failed - Error with identity dynamic block accessing null value
+
+Attempt 2:
+- Problem Analysis: can() function returns true even when value is null, causing attribute access error
+- Fix Method: Change for_each condition from can() to explicit != null check
+- Changes Made: Modified azapi.tf line 43, changed 'can(module.replicator.azapi_header.identity)' to 'module.replicator.azapi_header.identity != null'
+- Result: Retrying terraform plan...
+
+- Result: Success - Plan shows acceptable drifts only
+
+Final Result: Fix successful - All drifts match acceptable patterns (Pattern 1 and Pattern 2)

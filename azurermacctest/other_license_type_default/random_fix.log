@@ -1,0 +1,1 @@
+Test Case: other_license_type_default | Error: expected length to be in the range (X - Y), got 17. Computer name cannot be more than 15 characters | Fix: Changed random_string length from 8 to 5 characters (acctestvm + 5 chars = 15 total) | Result: Success

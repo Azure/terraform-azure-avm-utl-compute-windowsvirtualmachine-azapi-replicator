@@ -1,0 +1,1 @@
+Test Case: network_multiple_public | Error: computer name cannot be more than 15 characters (got 17) | Fix: Changed random_string length from 8 to 6 (acctestvm + 6 = 15 chars) | Result: Success

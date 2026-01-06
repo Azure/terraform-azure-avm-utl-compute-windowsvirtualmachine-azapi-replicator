@@ -1,0 +1,27 @@
+Test Case: image_from_shared_image_gallery
+================================================================================
+
+Step: Step 2 - Verify AzureRM Configuration (Baseline Test)
+
+Failed Command: terraform apply -auto-approve -input=false
+
+Error:
+Error: creating/updating Image (Subscription: "f7a632a5-49db-4c5e-9828-cd62cb753971"
+Resource Group Name: "acctestRG-856538"
+Image Name: "capture"): performing CreateOrUpdate: unexpected status 409 (409 Conflict) with error: OperationNotAllowed: The operation 'Create Image' requires the Virtual Machine 'acctvm-brrvlg1' to be Generalized.
+
+  with azurerm_image.test,
+  on main.tf line 131, in resource "azurerm_image" "test":
+ 131: resource "azurerm_image" "test" {
+
+Root Cause Analysis:
+The test case requires creating an Azure Image from a running VM, which requires the VM to be generalized first. However, the Terraform configuration does not include the VM generalization step (sysprep on Windows), which must be done outside of Terraform's control. This is a limitation of testing image creation scenarios in Terraform acceptance tests without external orchestration.
+
+The AzureRM provider test likely uses CheckDestroy or external scripts to handle VM generalization, which cannot be replicated in this isolated test environment.
+
+Conclusion:
+This test case cannot be validated in the current test framework without additional infrastructure to generalize the VM before image creation. The test is marked as INVALID.
+
+Additional Notes:
+- Fixed random_string length from 8 to 6 to avoid computer name exceeding 15 characters
+- Fix documented in random_fix.log

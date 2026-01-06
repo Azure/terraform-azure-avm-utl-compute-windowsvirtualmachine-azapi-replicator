@@ -1,0 +1,54 @@
+Test Case: image_from_image
+================================================================================
+
+Test Status: INVALID
+
+Failed at: Step 2 - Baseline AzureRM Configuration Test
+
+Initial Error:
+╷
+│ Error: creating/updating Image (Subscription: "f7a632a5-49db-4c5e-9828-cd62cb753971"
+│ Resource Group Name: "acctestRG-535082"
+│ Image Name: "capture"): performing CreateOrUpdate: unexpected status 409 (409 Conflict) with error: OperationNotAllowed: The operation 'Create Image' requires the Virtual Machine 'acctvm-oq5zu1' to be Generalized.
+│
+│   with azurerm_image.test,
+│   on main.tf line 125, in resource "azurerm_image" "test":
+│  125: resource "azurerm_image" "test" {
+│
+╵
+
+Failed Command: terraform apply -auto-approve -input=false
+
+Root Cause Analysis:
+The test case attempts to create an Azure Image (azurerm_image.test) from a running Virtual Machine (azurerm_windows_virtual_machine.source) without generalizing it first. 
+
+Azure requires VMs to be generalized (sysprep for Windows) before capturing them as images. This is a platform requirement that cannot be satisfied through Terraform configuration alone, as generalization requires:
+1. Running sysprep inside the Windows VM
+2. Deallocating the VM
+3. Marking the VM as generalized via Azure CLI/PowerShell: `az vm generalize`
+
+The test infrastructure (main.tf) creates the source VM but does not include:
+- VM extension to run sysprep
+- Provisioner to execute generalization commands
+- azurerm_virtual_machine_generalize resource (if such exists)
+
+This test case is structurally invalid as it cannot succeed in Terraform alone without manual intervention or external automation.
+
+Secondary Issue (Fixed):
+Initial attempt failed with computer name length validation:
+"unable to assume default computer name can be at most 15 characters, got 16"
+
+Fix Applied:
+Modified main.tf random_string length from 8 to 5 characters to ensure VM name stays within 15 char limit.
+Pattern: acctvm-<5chars>1 = 13 characters (within limit)
+
+Conclusion:
+This test case requires infrastructure changes beyond Terraform's scope. It is marked as INVALID because:
+1. The baseline azurerm configuration cannot be applied successfully
+2. The error is due to Azure platform requirements, not Terraform provider issues
+3. No Terraform-only solution exists without adding VM generalization steps
+
+The test case needs to be redesigned to either:
+- Pre-create a generalized image as a data source
+- Include VM extension and provisioners for generalization
+- Use a different image source approach (e.g., shared image gallery with pre-generalized images)

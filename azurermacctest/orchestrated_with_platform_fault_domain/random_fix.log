@@ -1,0 +1,8 @@
+Test Case: orchestrated_with_platform_fault_domain
+================================================================================
+
+Error: computer name cannot be more than 15 characters
+Expected length to be in the range (0 - 15), got 17 (acctestvm + 8 random chars)
+
+Fix: Adjusted random_string length from 8 to 6 in main.tf
+Result: Will verify on next apply attempt

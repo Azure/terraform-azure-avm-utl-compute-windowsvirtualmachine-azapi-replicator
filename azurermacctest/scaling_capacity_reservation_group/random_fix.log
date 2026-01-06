@@ -1,0 +1,1 @@
+Test Case: scaling_capacity_reservation_group | Error: computer name cannot be more than 15 characters | Fix: Changed random_string length from 8 to 5 in main.tf | Result: Success

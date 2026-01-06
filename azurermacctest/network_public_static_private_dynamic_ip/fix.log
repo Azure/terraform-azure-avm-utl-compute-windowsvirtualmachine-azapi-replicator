@@ -1,0 +1,25 @@
+Test Case: network_public_static_private_dynamic_ip
+================================================================================
+
+Initial Error:
+Error: Missing required argument
+  on azapi.tf line 1, in module "replicator":
+   1: module "replicator" {
+The argument "resource_group_id" is required, but no definition was found.
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: Module requires resource_group_id parameter but it was not provided in the module call
+- Fix Method: Add resource_group_id = azurerm_resource_group.test.id to module parameters
+- Changes Made: Added resource_group_id parameter to azapi.tf module call
+- Result: Fixed, but revealed new error
+
+Attempt 2:
+- Problem Analysis: Error "Attempt to get attribute from null value" on identity.value.type. The can() check returns true even when identity is null
+- Fix Method: Change condition from can(module.replicator.azapi_header.identity) to module.replicator.azapi_header.identity != null
+- Changes Made: Updated identity dynamic block condition in azapi.tf
+- Result: Success - plan now works
+
+Final Result: Fix successful - Plan shows acceptable drift patterns only (AzAPI metadata changes and removal of Azure-computed defaults)
+

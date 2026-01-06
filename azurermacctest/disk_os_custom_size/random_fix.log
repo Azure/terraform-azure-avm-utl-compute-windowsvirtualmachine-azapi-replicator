@@ -1,0 +1,2 @@
+Test Case: disk_os_custom_size | Error: expected os_disk.0.disk_size_gb to be in the range (0 - 4095), got 507311 | Fix: Changed random_integer min from 100000 to 100, max from 999999 to 4095 to fit disk_size_gb constraint | Result: Success, but encountered new error
+Test Case: disk_os_custom_size | Error: unable to assume default computer name "computer_name" can be at most 15 characters, got 17 | Fix: Changed random_string length from 8 to 6 to ensure VM name (acctestvm + 6 chars = 15 chars) fits computer_name constraint | Result: Retrying apply

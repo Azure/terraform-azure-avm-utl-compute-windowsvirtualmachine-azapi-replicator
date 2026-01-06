@@ -1,0 +1,22 @@
+Test Case: scalingProximityPlacementGroupRemoved
+================================================================================
+
+Initial Error:
+Error: Attempt to get attribute from null value
+
+  on azapi.tf line 46, in resource "azapi_resource" "this":
+   46:       type         = identity.value.type
+     ├────────────────
+     │ identity.value is null
+
+This value is null, so it does not have any attributes.
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: The dynamic identity block condition `can(module.replicator.azapi_header.identity)` checks if the attribute can be accessed, but returns true even when the value is null, causing iteration with a null value
+- Fix Method: Changed the for_each condition from `can(module.replicator.azapi_header.identity)` to `try(module.replicator.azapi_header.identity, null) != null` to properly check for null values
+- Changes Made: Updated azapi.tf line 44 identity for_each condition
+- Result: Success - terraform plan succeeded, showed acceptable drift only (API resource-level attributes and computed defaults removal), applied changes, verified idempotency with no further drift
+
+Final Result: Fix successful

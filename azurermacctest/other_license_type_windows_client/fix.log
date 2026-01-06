@@ -1,0 +1,22 @@
+Test Case: other_license_type_windows_client
+================================================================================
+
+Initial Error:
+Error: Attempt to get attribute from null value
+
+  on azapi.tf line 46, in resource "azapi_resource" "this":
+  46:       type         = identity.value.type
+    ├────────────────
+    │ identity.value is null
+
+This value is null, so it does not have any attributes.
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: The dynamic block for identity was using `can()` function which checks if the attribute exists, but not if it's null. Since the original config has no identity, the module returns null for identity, causing the error.
+- Fix Method: Changed the condition from `can(module.replicator.azapi_header.identity)` to `module.replicator.azapi_header.identity != null`
+- Changes Made: Modified line 44 in azapi.tf
+- Result: Success - plan now works
+
+Final Result: Fix successful

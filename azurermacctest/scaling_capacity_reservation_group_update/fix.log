@@ -1,0 +1,26 @@
+Test Case: scaling_capacity_reservation_group_update
+================================================================================
+
+Initial Error:
+Error: Missing required argument
+The argument "resource_group_name" is required, but no definition was found.
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: The azapi.tf was using resource_group_id instead of resource_group_name
+- Fix Method: Changed resource_group_id to resource_group_name in module call
+- Changes Made: Changed "resource_group_id = azurerm_resource_group.test.id" to "resource_group_name = azurerm_resource_group.test.name"
+- Result: Failed - module requires both resource_group_name AND resource_group_id
+
+Attempt 2:
+- Problem Analysis: The module requires both resource_group_name and resource_group_id (as seen in working examples)
+- Fix Method: Added both parameters to module call
+- Changes Made: Added both "resource_group_name = azurerm_resource_group.test.name" and "resource_group_id = azurerm_resource_group.test.id", plus "enable_telemetry = false"
+- Result: Failed - identity block issue with null value
+
+Attempt 3:
+- Problem Analysis: The dynamic identity block was not properly checking for null values
+- Fix Method: Updated the for_each condition to include null check (matching working example)
+- Changes Made: Changed for_each from "can(module.replicator.azapi_header.identity) ? ..." to "can(module.replicator.azapi_header.identity) && module.replicator.azapi_header.identity != null ? ..."
+- Result: Success - Plan shows acceptable drifts only (API attributes and computed defaults)

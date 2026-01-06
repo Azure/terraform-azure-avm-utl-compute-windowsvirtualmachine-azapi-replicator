@@ -1,0 +1,8 @@
+Test Case: scalingProximityPlacementGroupUpdate
+================================================================================
+
+Error: unable to assume default computer name "computer_name" can be at most 15 characters, got 17
+
+Fix: Adjusted random_string length from 8 to 6 in main.tf to ensure VM name "acctestvmXXXXXX" stays within 15 character limit (9 + 6 = 15 characters)
+
+Result: Success - VM created successfully after fix

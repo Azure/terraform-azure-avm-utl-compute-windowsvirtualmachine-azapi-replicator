@@ -1,0 +1,26 @@
+Test Case: scaling_additional_capabilities_ultra_ssd
+================================================================================
+
+Initial Error:
+Error: Unsupported attribute
+  on azapi.tf line 49, in resource "azapi_resource" "this":
+  49:     for_each = can(module.replicator.azapi_header.identity) ? [module.replicator.identity] : []
+     │ module.replicator is object with 8 attributes
+This object does not have an attribute named "identity".
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: The code checks for `module.replicator.azapi_header.identity` but then tries to access `module.replicator.identity`. The identity is actually part of the azapi_header output.
+- Fix Method: Changed `module.replicator.identity` to `module.replicator.azapi_header.identity` to match the correct output structure.
+- Changes Made: Line 49 in azapi.tf - changed for_each value from `[module.replicator.identity]` to `[module.replicator.azapi_header.identity]`
+- Result: Failed with new error - "Attempt to get attribute from null value" because identity.value is null
+
+Attempt 2:
+- Problem Analysis: The `can()` function doesn't check if the value is null, only if the attribute exists. Need to explicitly check for null value.
+- Fix Method: Changed from `can(module.replicator.azapi_header.identity)` to `module.replicator.azapi_header.identity != null`
+- Changes Made: Line 49 in azapi.tf - changed for_each condition to check for null instead of using can()
+- Result: Success - plan shows only acceptable drifts (AzAPI attributes and removed default values)
+
+Final Result: Fix successful
+

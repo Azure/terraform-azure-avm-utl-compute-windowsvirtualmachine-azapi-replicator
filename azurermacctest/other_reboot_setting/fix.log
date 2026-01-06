@@ -1,0 +1,30 @@
+Test Case: other_reboot_setting
+================================================================================
+
+Initial Error:
+creating/updating Resource: (ResourceId
+"/subscriptions/f7a632a5-49db-4c5e-9828-cd62cb753971/resourceGroups/acctestRG-124995/providers/Microsoft.Compute/virtualMachines/acctestvmby5ug"
+/ Api Version "2024-03-01"): PUT
+https://management.azure.com/subscriptions/f7a632a5-49db-4c5e-9828-cd62cb753971/resourceGroups/acctestRG-124995/providers/Microsoft.Compute/virtualMachines/acctestvmby5ug
+--------------------------------------------------------------------------------
+RESPONSE 400: 400 Bad Request
+ERROR CODE: InvalidParameter
+--------------------------------------------------------------------------------
+{
+  "error": {
+    "code": "InvalidParameter",
+    "message": "AutomaticByPlatformSettings cannot be set if the PatchMode is not 'AutomaticByPlatform'.",
+    "target": "windowsConfiguration.patchSettings.automaticByPlatformSettings"
+  }
+}
+--------------------------------------------------------------------------------
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: The error indicates that automaticByPlatformSettings is being sent but patchMode is not set to AutomaticByPlatform. The azurerm.tf.bak shows patch_mode = "AutomaticByPlatform" and reboot_setting = "Always" are configured. The module should include patchMode in the body when reboot_setting is set. After checking migrate_main.tf lines 294-309, found that patchSettings merge includes automaticByPlatformSettings and enableHotpatching, but the patchMode field itself is missing.
+- Fix Method: Add patchMode field to the patchSettings merge block in migrate_main.tf. The field should be included whenever var.patch_mode is not null.
+- Changes Made: Modified migrate_main.tf line 295-312 to include patchMode in the patchSettings merge. Added a new merge block: `var.patch_mode != null ? { patchMode = var.patch_mode } : {}`
+- Result: Success - Apply completed successfully, VM created, idempotency verified with "No changes" on second plan.
+
+Final Result: Fix successful

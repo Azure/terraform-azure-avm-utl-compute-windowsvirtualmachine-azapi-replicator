@@ -1,0 +1,25 @@
+Test Case: disk_os_storage_account_type_standard_lrs
+================================================================================
+
+Initial Error:
+Error: Attempt to get attribute from null value
+
+  on azapi.tf line 45, in resource "azapi_resource" "this":
+  45:       type         = identity.value.type
+     ├────────────────
+     │ identity.value is null
+
+This value is null, so it does not have any attributes.
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: The can() function is checking if the attribute exists, but it returns true even when the value is null. The identity attribute exists but is null, causing the dynamic block to iterate with a null value.
+- Fix Method: Change the for_each condition to check if the value is not null using try() and coalescence
+- Changes Made: Changed `for_each = can(module.replicator.azapi_header.identity) ? [module.replicator.azapi_header.identity] : []` to `for_each = try(module.replicator.azapi_header.identity, null) != null ? [module.replicator.azapi_header.identity] : []`
+- Result: Success - Plan now runs without errors. Detected drifts analyzed against acceptable_drift_patterns.md:
+  * All resource-level attributes (ignore_null_property, locks, replace_triggers_external_values, sensitive_body_version, output, type) ✅
+  * All body changes are Optional+Computed defaults being removed ✅
+  * All drifts are acceptable - proceeding with apply
+
+Final Result: Fix successful

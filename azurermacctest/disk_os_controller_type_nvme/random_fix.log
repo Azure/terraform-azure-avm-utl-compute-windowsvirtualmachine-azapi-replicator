@@ -1,0 +1,16 @@
+Test Case: disk_os_controller_type_nvme
+================================================================================
+
+Initial Error:
+unable to assume default computer name "computer_name" can be at most 15 characters, got 17. Please adjust the name, or specify an explicit computer_name
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: VM name 'acctestvm' (10 chars) + random_string (8 chars) = 18 chars exceeds Windows computer name limit of 15 characters
+- Fix Method: Reduce random_string length from 8 to 5 characters to get total of 15 chars
+- Changes Made: Modified main.tf line 35, changed random_string length from 8 to 5
+- Result: Retrying apply...
+
+
+Final Result: Fix successful

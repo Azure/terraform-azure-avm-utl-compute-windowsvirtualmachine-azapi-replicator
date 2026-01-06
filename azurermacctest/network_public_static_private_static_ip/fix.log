@@ -1,0 +1,22 @@
+Test Case: network_public_static_private_static_ip
+================================================================================
+
+Initial Error:
+Error: Attempt to get attribute from null value
+
+  on azapi.tf line 46, in resource "azapi_resource" "this":
+   46:       type         = identity.value.type
+     ├────────────────
+     │ identity.value is null
+
+This value is null, so it does not have any attributes.
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: The dynamic identity block uses can() to check if the attribute exists, but doesn't check if the value is null. When identity is null, can() returns true (attribute exists) but the for_each creates an iteration with null value.
+- Fix Method: Change the for_each condition to also check for null value using try() with a fallback to null, then check if the result is not null
+- Changes Made: Modified line 44 from `for_each = can(module.replicator.azapi_header.identity) ? [module.replicator.azapi_header.identity] : []` to `for_each = try(module.replicator.azapi_header.identity, null) != null ? [module.replicator.azapi_header.identity] : []`
+- Result: Success - plan now runs without error
+
+Next Step: Apply changes and verify idempotency to check if drifts are acceptable

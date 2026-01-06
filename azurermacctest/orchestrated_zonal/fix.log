@@ -1,0 +1,25 @@
+Test Case: orchestrated_zonal
+================================================================================
+
+Initial Error:
+Error: Unsupported attribute
+  on azapi.tf line 48, in resource "azapi_resource" "this":
+  48:     for_each = can(module.replicator.azapi_header.identity) ? [module.replicator.identity] : []
+This object does not have an attribute named "identity".
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: The identity block references module.replicator.identity which doesn't exist as a separate output. The identity is part of azapi_header output.
+- Fix Method: Change module.replicator.identity to module.replicator.azapi_header.identity
+- Changes Made: Modified azapi.tf line 48 from [module.replicator.identity] to [module.replicator.azapi_header.identity]
+- Result: New error - identity.value is null
+
+Attempt 2:
+- Problem Analysis: The can() function returns true even if identity is null, causing the for_each to include a null value
+- Fix Method: Change condition from can() to check if identity is not null using try() != null pattern
+- Changes Made: Modified azapi.tf line 47 from can(module.replicator.azapi_header.identity) to try(module.replicator.azapi_header.identity, null) != null
+- Result: Success - plan shows acceptable drifts only (all match patterns in acceptable_drift_patterns.md)
+
+Final Result: Fix successful
+

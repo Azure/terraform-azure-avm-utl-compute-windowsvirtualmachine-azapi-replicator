@@ -1,0 +1,1 @@
+Test Case: orchestrated_id_un_attached | Error: computer name cannot be more than 15 characters | Fix: Changed random_string length from 8 to 5 (acctestvm prefix is 10 chars, total becomes 15 chars) | Result: Success

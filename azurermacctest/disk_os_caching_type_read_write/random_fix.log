@@ -1,0 +1,15 @@
+Test Case: disk_os_caching_type_read_write
+================================================================================
+
+Initial Error:
+computer_name cannot be more than 15 characters (got 17 from default name 'acctestvm' + 8 chars)
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: VM name 'acctestvm' (9) + random_string (8) = 17 chars > 15 limit
+- Fix Method: Reduce random_string length from 8 to 6 in main.tf
+- Changes Made: Changed random_string.name length from 8 to 6
+- Result: Retrying terraform apply...
+
+Final Result: Fix successful

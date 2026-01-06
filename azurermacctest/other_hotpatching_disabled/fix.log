@@ -1,0 +1,27 @@
+Test Case: other_hotpatching_disabled
+================================================================================
+
+Initial Error:
+Error: Missing required argument - The argument "resource_group_id" is required, but no definition was found.
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: The module requires resource_group_id but azapi.tf only has resource_group_name
+- Fix Method: Add resource_group_id argument to module call
+- Changes Made: Added resource_group_id = azurerm_resource_group.test.id to module call
+
+Attempt 1:
+- Result: Resolved resource_group_id error, but new error appeared
+
+Attempt 2:
+- Problem Analysis: Dynamic identity block in azapi_resource is trying to access null value
+- Fix Method: Fix the dynamic block condition to properly check for identity
+- Changes Made: Modified dynamic identity block to use a safer check
+
+Attempt 2:
+- Result: Plan succeeded with acceptable drifts detected
+
+Final Result: Fix successful - All detected drifts are acceptable per acceptable_drift_patterns.md
+- Resource-level attributes (ignore_null_property, locks, output, replace_triggers_external_values, sensitive_body_version, type) - all acceptable
+- Body changes appear to be computed values being removed, which is expected with ignore_null_property = true

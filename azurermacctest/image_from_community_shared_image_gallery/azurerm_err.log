@@ -1,0 +1,33 @@
+Test Case: image_from_community_shared_image_gallery
+================================================================================
+
+Failed Command: terraform apply -auto-approve -input=false
+
+Error Message:
+Error: creating/updating Image (Subscription: "f7a632a5-49db-4c5e-9828-cd62cb753971"
+Resource Group Name: "acctestRG-730063"
+Image Name: "capture"): performing CreateOrUpdate: unexpected status 409 (409 Conflict) with error: OperationNotAllowed: The operation 'Create Image' requires the Virtual Machine 'acctvm-grxcao1' to be Generalized.
+
+Root Cause Analysis:
+This test case requires creating an Azure Image from a running Windows VM. The Azure Image resource (azurerm_image.test) attempts to capture the source VM (azurerm_windows_virtual_machine.source) but fails because Azure requires the VM to be in a "Generalized" state before it can be captured as an image.
+
+The generalization process involves:
+1. Running sysprep on the Windows VM (removes machine-specific information)
+2. Deallocating the VM in Azure
+3. Marking the VM as generalized using Azure API/CLI
+
+This process cannot be automated in a pure Terraform configuration because:
+- It requires executing commands inside the VM (sysprep)
+- It requires interactive Azure operations between VM creation and image capture
+- Terraform doesn't support in-place VM generalization
+
+This is a fundamental limitation of the test case design. The original AzureRM provider acceptance tests likely use Go code to orchestrate the generalization process outside of Terraform, which is not possible in a pure HCL-based test environment.
+
+Additional Issues Encountered:
+1. Computer name length constraint: The initial VM name "acctvm-${random_string.name.result}1" (16 chars) exceeded the 15-character limit for Windows computer names. This was temporarily fixed by reducing random_string length from 8 to 6, but the test still failed at the image capture stage.
+
+Conclusion:
+This test case is INVALID for pure Terraform-based testing. It requires manual intervention or external orchestration that cannot be expressed in Terraform HCL alone. The test should be excluded from automated testing suites.
+
+Test Status: INVALID
+Reason: Requires VM generalization which cannot be automated in Terraform

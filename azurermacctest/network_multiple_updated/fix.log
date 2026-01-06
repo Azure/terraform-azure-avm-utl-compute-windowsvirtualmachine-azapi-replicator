@@ -1,0 +1,20 @@
+Test Case: network_multiple_updated
+================================================================================
+
+Initial Error:
+Error: Attempt to get attribute from null value
+on azapi.tf line 47, in resource "azapi_resource" "this":
+47:       type         = identity.value.type
+identity.value is null
+This value is null, so it does not have any attributes.
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: The dynamic block uses can() to check if identity exists, but can() returns true even when the value is null. When identity is null, can() adds [null] to the for_each, causing the error.
+- Fix Method: Change the condition to explicitly check for null using != null instead of can()
+- Changes Made: Modified line 45 from `for_each = can(module.replicator.azapi_header.identity) ? [module.replicator.azapi_header.identity] : []` to `for_each = module.replicator.azapi_header.identity != null ? [module.replicator.azapi_header.identity] : []`
+- Result: Success - Plan now executes successfully. Shows acceptable drifts (ignore_null_property, locks, replace_triggers_external_values, sensitive_body_version, output, type changes) and body changes that appear to be Azure API computed defaults.
+
+Final Result: Fix successful
+

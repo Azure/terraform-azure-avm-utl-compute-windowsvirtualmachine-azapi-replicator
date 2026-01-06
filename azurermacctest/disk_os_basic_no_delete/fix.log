@@ -1,0 +1,20 @@
+Test Case: disk_os_basic_no_delete
+================================================================================
+
+Initial Error:
+Error: Attempt to get attribute from null value
+  on azapi.tf line 46, in resource "azapi_resource" "this":
+  46:       type         = identity.value.type
+     ├────────────────
+     │ identity.value is null
+This value is null, so it does not have any attributes.
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: The dynamic identity block uses can() to check if the identity attribute exists, but can() returns true even when the value is null. This causes the for_each to include a null value, leading to the error when trying to access identity.value.type
+- Fix Method: Add an additional null check to the for_each condition
+- Changes Made: Changed `for_each = can(module.replicator.azapi_header.identity) ? [module.replicator.azapi_header.identity] : []` to `for_each = can(module.replicator.azapi_header.identity) && module.replicator.azapi_header.identity != null ? [module.replicator.azapi_header.identity] : []`
+- Result: Success - Plan now works. Detected drifts are all acceptable (AzAPI resource-level attributes and computed/optional Azure API fields)
+
+Final Result: Fix successful

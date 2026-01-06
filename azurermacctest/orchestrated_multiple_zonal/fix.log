@@ -1,0 +1,27 @@
+Test Case: orchestrated_multiple_zonal
+================================================================================
+
+Initial Error:
+Error: Attempt to get attribute from null value
+  on azapi.tf line 49, in resource "azapi_resource" "test":
+  49:       type         = identity.value.type
+    ├────────────────
+    │ identity.value is null
+This value is null, so it does not have any attributes.
+
+(Same error on line 113 for resource "azapi_resource" "another")
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: The dynamic identity block uses can() to check if identity exists, but can() returns true even when the value is null. The for_each then includes the null value, causing the error when trying to access identity.value.type.
+- Fix Method: Change the for_each condition to check both can() and that the value is not null using try() with a comparison to null.
+- Changes Made: 
+  Line 47: Change from `can(module.replicator_test.azapi_header.identity) ? [module.replicator_test.azapi_header.identity] : []`
+           to `try(module.replicator_test.azapi_header.identity, null) != null ? [module.replicator_test.azapi_header.identity] : []`
+  Line 111: Change from `can(module.replicator_another.azapi_header.identity) ? [module.replicator_another.azapi_header.identity] : []`
+            to `try(module.replicator_another.azapi_header.identity, null) != null ? [module.replicator_another.azapi_header.identity] : []`
+- Result: Success - terraform plan now runs without errors and shows acceptable drift patterns only (ignore_null_property, locks, replace_triggers_external_values, sensitive_body_version, output, type API version, and body fields that are Optional+Computed from Azure API)
+
+Final Result: Fix successful
+

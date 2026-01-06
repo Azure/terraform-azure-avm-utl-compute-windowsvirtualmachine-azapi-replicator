@@ -1,0 +1,37 @@
+Test Case: scaling_dedicated_host_initial
+================================================================================
+
+Initial Error:
+Error: Unsupported attribute
+  on azapi.tf line 44, in resource "azapi_resource" "this":
+  44:     for_each = can(module.replicator.azapi_header.identity) ? [module.replicator.identity] : []
+This object does not have an attribute named "identity".
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: The error indicates module.replicator.identity doesn't exist as a separate output. According to common_terraform_error.md pattern #3 (Redundant Module Outputs), identity is included in azapi_header composite object.
+- Fix Method: Change reference from module.replicator.identity to module.replicator.azapi_header.identity to use the canonical path. Also updated identity_ids mapping to use userAssignedIdentities keys.
+- Changes Made: 
+  1. Changed for_each value from [module.replicator.identity] to [module.replicator.azapi_header.identity]
+  2. Updated identity_ids mapping to extract keys from userAssignedIdentities object: keys(identity.value.userAssignedIdentities)
+- Result: Testing now...
+
+
+Attempt 2:
+- Problem Analysis: The for_each condition used can() which returns true even for null values. When identity is null, the dynamic block still tries to create content and access identity.value.type which fails.
+- Fix Method: Change condition from can(module.replicator.azapi_header.identity) to module.replicator.azapi_header.identity != null
+- Changes Made: Updated for_each condition to explicitly check for null: module.replicator.azapi_header.identity != null
+- Result: Testing now...
+
+
+Final Result: Fix successful
+
+Summary:
+- Initial error was module.replicator.identity not existing as a separate output
+- Fixed by using canonical path module.replicator.azapi_header.identity
+- Second issue was null identity causing attribute access error
+- Fixed by changing condition from can() to explicit != null check
+- All drifts detected were acceptable per acceptable_drift_patterns.md (AzAPI metadata and computed defaults)
+- State migration completed successfully with no drift after apply
+

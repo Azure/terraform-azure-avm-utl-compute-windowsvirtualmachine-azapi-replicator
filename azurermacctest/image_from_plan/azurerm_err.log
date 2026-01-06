@@ -1,0 +1,24 @@
+Test Case: image_from_plan
+================================================================================
+
+Step 2 Failed - Baseline Validation Failed
+
+Error:
+ResourcePurchaseValidationFailed: User failed validation to purchase resources. Error message: 'Offer with PublisherId: 'plesk', OfferId: 'plesk-onyx-windows' cannot be purchased due to validation errors. The 'unknown' payment instrument(s) is not supported for offer with OfferId: 'plesk-onyx-windows', PlanId 'plsk-win-hst-azr-m'. The offer with PublisherId: 'plesk', OfferId: 'plesk-onyx-windows' and PlanId: 'plsk-win-hst-azr-m' cannot be used on selected subscription to purchase paid marketplace offers.
+
+Failed Command:
+terraform apply -auto-approve -input=false
+
+Root Cause Analysis:
+This is a subscription-level limitation, not a code issue. The Azure subscription being used does not have the ability to purchase paid marketplace offers. The imageFromPlan test case requires a marketplace image from Plesk (plesk-onyx-windows), which is a paid offering that requires:
+1. A valid payment instrument configured on the subscription
+2. A subscription type that supports marketplace purchases (not a free/trial subscription)
+
+The error message explicitly states:
+- "The 'unknown' payment instrument(s) is not supported"
+- "cannot be used on selected subscription to purchase paid marketplace offers"
+
+This is an environmental/subscription limitation, not a test or module implementation issue.
+
+Conclusion:
+Test case must be marked as INVALID due to subscription limitations. The test cannot be completed in this environment regardless of code correctness.

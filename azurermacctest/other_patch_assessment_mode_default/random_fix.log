@@ -1,0 +1,1 @@
+Test Case: other_patch_assessment_mode_default | Error: unable to assume default computer name "computer_name" can be at most 15 characters, got 17 | Fix: Changed random_string length from 8 to 6 (acctestvm = 9 chars + 6 chars = 15 chars total) | Result: Success

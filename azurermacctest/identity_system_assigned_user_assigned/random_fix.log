@@ -1,0 +1,1 @@
+Test Case: identity_system_assigned_user_assigned | Error: computer name cannot be more than 15 characters, got 17 from "acctestvm" + 8 random chars | Fix: Changed random_string length from 8 to 5 (acctestvm = 9 chars + 5 random = 14 chars total) | Result: Retrying apply
