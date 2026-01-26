@@ -613,14 +613,6 @@ Type: `string`
 
 Default: `null`
 
-### <a name="input_vm_agent_platform_updates_enabled"></a> [vm\_agent\_platform\_updates\_enabled](#input\_vm\_agent\_platform\_updates\_enabled)
-
-Description: n/a
-
-Type: `bool`
-
-Default: `null`
-
 ### <a name="input_vtpm_enabled"></a> [vtpm\_enabled](#input\_vtpm\_enabled)
 
 Description: (Optional) Specifies if vTPM (virtual Trusted Platform Module) and Trusted Launch is enabled for the Virtual Machine. Changing this forces a new resource to be created.

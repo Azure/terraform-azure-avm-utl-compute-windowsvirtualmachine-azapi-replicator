@@ -80,6 +80,7 @@ module "replicator" {
   admin_password         = ephemeral.random_password.pass.result
   admin_password_version = 1
   admin_username         = "adminuser"
+  enable_telemetry       = var.enable_telemetry
   source_image_reference = {
     publisher = "MicrosoftWindowsServer"
     offer     = "WindowsServer"
@@ -165,7 +166,7 @@ If it is set to false, then no telemetry will be collected.
 
 Type: `bool`
 
-Default: `true`
+Default: `false`
 
 ## Outputs
 

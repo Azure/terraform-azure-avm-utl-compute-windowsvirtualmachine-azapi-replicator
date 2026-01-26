@@ -1148,11 +1148,6 @@ variable "virtual_machine_scale_set_id" {
   description = "(Optional) Specifies the Orchestrated Virtual Machine Scale Set that this Virtual Machine should be created within."
 }
 
-variable "vm_agent_platform_updates_enabled" {
-  type    = bool
-  default = null
-}
-
 variable "vtpm_enabled" {
   type        = bool
   default     = null
