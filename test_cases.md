@@ -162,7 +162,7 @@
 | Case Name | File URL | Status | Test Status |
 | --- | --- | --- | --- |
 | diskOSBasicNoDelete | https://raw.githubusercontent.com/hashicorp/terraform-provider-azurerm/refs/heads/main/internal/services/compute/windows_virtual_machine_resource_disk_os_test.go | Completed | test success |
-| diskOSImportManagedDisk | https://raw.githubusercontent.com/hashicorp/terraform-provider-azurerm/refs/heads/main/internal/services/compute/windows_virtual_machine_resource_disk_os_test.go | Completed | invalid |
+| diskOSImportManagedDisk | https://raw.githubusercontent.com/hashicorp/terraform-provider-azurerm/refs/heads/main/internal/services/compute/windows_virtual_machine_resource_disk_os_test.go | Completed | test success |
 | diskOSImportManagedDiskUpdate | https://raw.githubusercontent.com/hashicorp/terraform-provider-azurerm/refs/heads/main/internal/services/compute/windows_virtual_machine_resource_disk_os_test.go | Completed | invalid |
 
 ## Network Configuration Cases (15 cases):

@@ -3,13 +3,13 @@
 [0m[1mmodule.replicator.data.modtm_module_source.telemetry[0]: Reading...[0m[0m
 [0m[1mmodule.replicator.data.modtm_module_source.telemetry[0]: Read complete after 0s[0m
 [0m[1mmodule.replicator.data.azapi_client_config.telemetry[0]: Reading...[0m[0m
-[0m[1mmodule.replicator.data.azapi_client_config.telemetry[0]: Read complete after 1s [id=clientConfigs/subscriptionId=f7a632a5-49db-4c5e-9828-cd62cb753971;tenantId=fc2bf966-a984-438c-93b7-bc5a06fe7f0d][0m
-[0m[1mazurerm_resource_group.test: Refreshing state... [id=/subscriptions/f7a632a5-49db-4c5e-9828-cd62cb753971/resourceGroups/acctestRG-907187][0m
-[0m[1mazurerm_virtual_network.test: Refreshing state... [id=/subscriptions/f7a632a5-49db-4c5e-9828-cd62cb753971/resourceGroups/acctestRG-907187/providers/Microsoft.Network/virtualNetworks/acctestnw-907187][0m
+[0m[1mmodule.replicator.data.azapi_client_config.telemetry[0]: Read complete after 1s [id=clientConfigs/subscriptionId=;tenantId=fc2bf966-a984-438c-93b7-bc5a06fe7f0d][0m
+[0m[1mazurerm_resource_group.test: Refreshing state... [id=/subscriptions//resourceGroups/acctestRG-907187][0m
+[0m[1mazurerm_virtual_network.test: Refreshing state... [id=/subscriptions//resourceGroups/acctestRG-907187/providers/Microsoft.Network/virtualNetworks/acctestnw-907187][0m
 [0m[1mmodule.replicator.data.azapi_resource.existing: Reading...[0m[0m
-[0m[1mazurerm_subnet.test: Refreshing state... [id=/subscriptions/f7a632a5-49db-4c5e-9828-cd62cb753971/resourceGroups/acctestRG-907187/providers/Microsoft.Network/virtualNetworks/acctestnw-907187/subnets/internal][0m
-[0m[1mmodule.replicator.data.azapi_resource.existing: Read complete after 1s [id=/subscriptions/f7a632a5-49db-4c5e-9828-cd62cb753971/resourceGroups/acctestRG-907187/providers/Microsoft.Compute/virtualMachines/acctestvm72o6c][0m
-[0m[1mazurerm_network_interface.test: Refreshing state... [id=/subscriptions/f7a632a5-49db-4c5e-9828-cd62cb753971/resourceGroups/acctestRG-907187/providers/Microsoft.Network/networkInterfaces/acctestnic-907187][0m
+[0m[1mazurerm_subnet.test: Refreshing state... [id=/subscriptions//resourceGroups/acctestRG-907187/providers/Microsoft.Network/virtualNetworks/acctestnw-907187/subnets/internal][0m
+[0m[1mmodule.replicator.data.azapi_resource.existing: Read complete after 1s [id=/subscriptions//resourceGroups/acctestRG-907187/providers/Microsoft.Compute/virtualMachines/acctestvm72o6c][0m
+[0m[1mazurerm_network_interface.test: Refreshing state... [id=/subscriptions//resourceGroups/acctestRG-907187/providers/Microsoft.Network/networkInterfaces/acctestnic-907187][0m
 
 Terraform used the selected providers to generate the following execution
 plan. Resource actions are indicated with the following symbols:
@@ -27,7 +27,7 @@ Terraform planned the following actions, but then encountered a problem:
           [32m+[0m[0m "module_source"   = "../.."
           [32m+[0m[0m "module_version"  = [90mnull[0m[0m
           [32m+[0m[0m "random_id"       = (known after apply)
-          [32m+[0m[0m "subscription_id" = "f7a632a5-49db-4c5e-9828-cd62cb753971"
+          [32m+[0m[0m "subscription_id" = ""
           [32m+[0m[0m "tenant_id"       = "fc2bf966-a984-438c-93b7-bc5a06fe7f0d"
         }
     }

@@ -61,6 +61,9 @@ locals {
                     {
                       storageAccountType = local.effective_os_disk_storage_account_type
                     },
+                    var.os_managed_disk_id != null ? {
+                      id = var.os_managed_disk_id
+                    } : {},
                     local.effective_os_disk_disk_encryption_set_id != null ? {
                       diskEncryptionSet = {
                         id = local.effective_os_disk_disk_encryption_set_id
@@ -95,7 +98,7 @@ locals {
                 {
                   writeAcceleratorEnabled = var.os_disk.write_accelerator_enabled
 
-                  createOption = "FromImage"
+                  createOption = var.os_managed_disk_id != null ? "Attach" : "FromImage"
                   osType       = "Windows"
                 }
               )
@@ -144,7 +147,7 @@ locals {
                 {
                   provisionVMAgent = var.provision_vm_agent
                 },
-                var.bypass_platform_safety_checks_on_user_schedule_enabled || var.hotpatching_enabled != null || var.reboot_setting != null ? {
+                var.bypass_platform_safety_checks_on_user_schedule_enabled || var.hotpatching_enabled != null || var.patch_assessment_mode != null || var.patch_mode != null || var.reboot_setting != null ? {
                   patchSettings = merge(
                     var.bypass_platform_safety_checks_on_user_schedule_enabled || var.reboot_setting != null ? {
                       automaticByPlatformSettings = merge(
@@ -155,6 +158,9 @@ locals {
                           rebootSetting = var.reboot_setting
                         } : {}
                       )
+                    } : {},
+                    var.patch_assessment_mode != null ? {
+                      assessmentMode = var.patch_assessment_mode
                     } : {},
                     var.hotpatching_enabled != null ? {
                       enableHotpatching = var.hotpatching_enabled
@@ -241,6 +247,9 @@ locals {
           evictionPolicy = var.eviction_policy
         } : {},
         {
+          priority = var.priority
+        },
+        {
           licenseType = local.effective_license_type
         },
         local.effective_proximity_placement_group_id != null ? {
@@ -255,6 +264,9 @@ locals {
           virtualMachineScaleSet = {
             id = var.virtual_machine_scale_set_id
           }
+        } : {},
+        var.platform_fault_domain != -1 ? {
+          platformFaultDomain = var.platform_fault_domain
         } : {},
         {
           diagnosticsProfile = {
@@ -296,6 +308,11 @@ locals {
               }
             } : {}
           )
+        } : {},
+        var.max_bid_price > 0 ? {
+          billingProfile = {
+            maxPrice = var.max_bid_price
+          }
         } : {}
       )
     },
@@ -400,6 +417,9 @@ locals {
     dedicated_host_group_id                  = { value = var.dedicated_host_group_id }
     edge_zone                                = { value = local.edge_zone_normalized }
     eviction_policy                          = { value = var.eviction_policy }
+    os_managed_disk_id                       = { value = var.os_managed_disk_id }
+    platform_fault_domain                    = { value = var.platform_fault_domain }
+    priority                                 = { value = var.priority }
     provision_vm_agent                       = { value = var.provision_vm_agent }
     proximity_placement_group_id             = { value = var.proximity_placement_group_id }
     secure_boot_enabled                      = { value = var.secure_boot_enabled }

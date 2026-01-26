@@ -66,12 +66,12 @@ func resourceWindowsVirtualMachineCreate(d *pluginsdk.ResourceData, meta interfa
 | 22 | extensions_time_budget | Argument | No | ✅ Completed | [22.extensions_time_budget.md](22.extensions_time_budget.md) |
 | 23 | hotpatching_enabled | Argument | No | ✅ Completed | [23.hotpatching_enabled.md](23.hotpatching_enabled.md) |
 | 24 | license_type | Argument | No | ✅ Completed | [24.license_type.md](24.license_type.md) |
-| 25 | max_bid_price | Argument | No | Failed | |
-| 26 | os_managed_disk_id | Argument | No | Failed | |
-| 27 | patch_assessment_mode | Argument | No | Failed | |
-| 28 | patch_mode | Argument | No | Failed | |
-| 29 | platform_fault_domain | Argument | No | Failed | |
-| 30 | priority | Argument | No | Pending | |
+| 25 | max_bid_price | Argument | No | ✅ Completed | [25.max_bid_price.md](25.max_bid_price.md) |
+| 26 | os_managed_disk_id | Argument | No | Pending for check | [26.os_managed_disk_id.md](26.os_managed_disk_id.md) |
+| 27 | patch_assessment_mode | Argument | No | ✅ Completed | [27.patch_assessment_mode.md](27.patch_assessment_mode.md) |
+| 28 | patch_mode | Argument | No | ✅ Completed | [28.patch_mode.md](28.patch_mode.md) |
+| 29 | platform_fault_domain | Argument | No | ✅ Completed | [29.platform_fault_domain.md](29.platform_fault_domain.md) |
+| 30 | priority | Argument | No | ✅ Completed | [30.priority.md](30.priority.md) |
 | 31 | provision_vm_agent | Argument | No | ✅ Completed | [31.provision_vm_agent.md](31.provision_vm_agent.md) |
 | 32 | proximity_placement_group_id | Argument | No | ✅ Completed | [32.proximity_placement_group_id.md](32.proximity_placement_group_id.md) |
 | 33 | reboot_setting | Argument | No | ✅ Completed | [33.reboot_setting.md](33.reboot_setting.md) |

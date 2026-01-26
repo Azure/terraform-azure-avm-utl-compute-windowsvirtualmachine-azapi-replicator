@@ -4,7 +4,7 @@ Test Case: disk_os_write_accelerator_enabled
 Failed Command: terraform apply -auto-approve -input=false
 
 Error Message:
-Error: creating Windows Virtual Machine (Subscription: "f7a632a5-49db-4c5e-9828-cd62cb753971"
+Error: creating Windows Virtual Machine (Subscription: ""
 Resource Group Name: "acctestRG-418210"
 Virtual Machine Name: "acctestvmwdd5j0"): performing CreateOrUpdate: unexpected status 409 (409 Conflict) with error:
 OperationNotAllowed: Operation could not be completed as it results in exceeding approved standardMSFamily Cores quota.

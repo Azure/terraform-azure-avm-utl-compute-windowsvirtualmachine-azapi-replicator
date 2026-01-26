@@ -13,8 +13,6 @@ The following requirements are needed by this module:
 
 - <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.4)
 
-- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 4.0)
-
 - <a name="requirement_modtm"></a> [modtm](#requirement\_modtm) (~> 0.3)
 
 - <a name="requirement_random"></a> [random](#requirement\_random) (~> 3.5)
@@ -90,12 +88,6 @@ object({
 ### <a name="input_resource_group_id"></a> [resource\_group\_id](#input\_resource\_group\_id)
 
 Description: The ID of the Resource Group in which the Windows Virtual Machine should exist.
-
-Type: `string`
-
-### <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name)
-
-Description: (Required) The name of the Resource Group in which the Windows Virtual Machine should be exist. Changing this forces a new resource to be created.
 
 Type: `string`
 
@@ -387,7 +379,7 @@ Description: (Optional) The maximum price you're willing to pay for this Virtual
 
 Type: `number`
 
-Default: `null`
+Default: `-1`
 
 ### <a name="input_os_image_notification"></a> [os\_image\_notification](#input\_os\_image\_notification)
 
@@ -400,6 +392,14 @@ object({
     timeout = optional(string, "PT15M")
   })
 ```
+
+Default: `null`
+
+### <a name="input_os_managed_disk_id"></a> [os\_managed\_disk\_id](#input\_os\_managed\_disk\_id)
+
+Description: (Optional) The ID of an existing Managed Disk which should be attached as the OS Disk of this Virtual Machine. If this is set, the Virtual Machine will be created using the 'Attach' option. When using an existing OS Disk, `source_image_id` and `source_image_reference` cannot be specified.
+
+Type: `string`
 
 Default: `null`
 
@@ -443,7 +443,7 @@ Description: (Optional) Specifies the Platform Fault Domain in which this Window
 
 Type: `number`
 
-Default: `null`
+Default: `-1`
 
 ### <a name="input_priority"></a> [priority](#input\_priority)
 
@@ -451,7 +451,7 @@ Description: (Optional) Specifies the priority of this Virtual Machine. Possible
 
 Type: `string`
 
-Default: `null`
+Default: `"Regular"`
 
 ### <a name="input_provision_vm_agent"></a> [provision\_vm\_agent](#input\_provision\_vm\_agent)
 
@@ -562,23 +562,32 @@ Default: `null`
 
 ### <a name="input_timeouts"></a> [timeouts](#input\_timeouts)
 
-Description: - `create` -
-- `delete` -
-- `read` -
-- `update` -
+Description: - `create` -  (Optional) Specifies the timeout for create operations. Defaults to 45 minutes.
+- `delete` - (Optional) Specifies the timeout for delete operations. Defaults to 45 minutes.
+- `read` - (Optional) Specifies the timeout for read operations. Defaults to 5 minutes.
+- `update` - (Optional) Specifies the timeout for update operations. Defaults to 45 minutes.
 
 Type:
 
 ```hcl
 object({
-    create = optional(string)
-    delete = optional(string)
-    read   = optional(string)
-    update = optional(string)
+    create = optional(string, "45m")
+    delete = optional(string, "45m")
+    read   = optional(string, "5m")
+    update = optional(string, "45m")
   })
 ```
 
-Default: `null`
+Default:
+
+```json
+{
+  "create": "45m",
+  "delete": "45m",
+  "read": "5m",
+  "update": "45m"
+}
+```
 
 ### <a name="input_timezone"></a> [timezone](#input\_timezone)
 

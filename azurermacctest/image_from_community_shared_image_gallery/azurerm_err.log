@@ -4,7 +4,7 @@ Test Case: image_from_community_shared_image_gallery
 Failed Command: terraform apply -auto-approve -input=false
 
 Error Message:
-Error: creating/updating Image (Subscription: "f7a632a5-49db-4c5e-9828-cd62cb753971"
+Error: creating/updating Image (Subscription: ""
 Resource Group Name: "acctestRG-730063"
 Image Name: "capture"): performing CreateOrUpdate: unexpected status 409 (409 Conflict) with error: OperationNotAllowed: The operation 'Create Image' requires the Virtual Machine 'acctvm-grxcao1' to be Generalized.
 

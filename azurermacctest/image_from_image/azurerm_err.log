@@ -7,7 +7,7 @@ Failed at: Step 2 - Baseline AzureRM Configuration Test
 
 Initial Error:
 ╷
-│ Error: creating/updating Image (Subscription: "f7a632a5-49db-4c5e-9828-cd62cb753971"
+│ Error: creating/updating Image (Subscription: ""
 │ Resource Group Name: "acctestRG-535082"
 │ Image Name: "capture"): performing CreateOrUpdate: unexpected status 409 (409 Conflict) with error: OperationNotAllowed: The operation 'Create Image' requires the Virtual Machine 'acctvm-oq5zu1' to be Generalized.
 │

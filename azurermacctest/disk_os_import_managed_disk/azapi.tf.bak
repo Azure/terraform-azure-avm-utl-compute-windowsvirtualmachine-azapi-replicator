@@ -1,28 +1,23 @@
-# NOTE: This test case uses 'os_managed_disk_id' which is marked as "Failed" in track.md
-# and is not currently implemented in the module variables. This conversion is provided
-# for reference but may not work until os_managed_disk_id support is added.
-
-# The original test imports an existing managed disk for the OS disk, which is a special
-# scenario that may require additional implementation work in the module.
-
 module "replicator" {
   source = "../../"
 
-  name                  = local.vm_name
-  resource_group_name   = azurerm_resource_group.test.name
+  name                  = local.vm_name_short
+  resource_group_id     = azurerm_resource_group.test.id
   location              = azurerm_resource_group.test.location
-  size                  = "Standard_F2"
+  size                  = "Standard_E2bds_v5"
   network_interface_ids = [azurerm_network_interface.test.id]
 
-  # NOTE: os_managed_disk_id not yet supported - see track.md item 26
-  # Original value: data.azurerm_managed_disks.test.disk.0.id
-  
+  # These must be set when using os_managed_disk_id
+  provision_vm_agent         = false
+  allow_extension_operations = false
+  automatic_updates_enabled  = null
+
+  os_managed_disk_id = azurerm_managed_disk.test.id
+
   os_disk = {
     caching              = "ReadWrite"
-    storage_account_type = "Premium_LRS"  # Default value required by module
+    storage_account_type = "Premium_LRS" # Default value required by module
   }
-
-  resource_group_id = azurerm_resource_group.test.id
 }
 
 resource "azapi_resource" "this" {
@@ -40,7 +35,7 @@ resource "azapi_resource" "this" {
   retry                            = module.replicator.retry
 
   dynamic "identity" {
-    for_each = can(module.replicator.azapi_header.identity) ? [module.replicator.identity] : []
+    for_each = module.replicator.azapi_header.identity != null ? [module.replicator.azapi_header.identity] : []
     content {
       type         = identity.value.type
       identity_ids = try(identity.value.identity_ids, null)

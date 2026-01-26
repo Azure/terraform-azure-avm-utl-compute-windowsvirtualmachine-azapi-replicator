@@ -145,25 +145,6 @@ variable "resource_group_id" {
   nullable    = false
 }
 
-variable "resource_group_name" {
-  type        = string
-  description = "(Required) The name of the Resource Group in which the Windows Virtual Machine should be exist. Changing this forces a new resource to be created."
-  nullable    = false
-
-  validation {
-    condition     = length(var.resource_group_name) <= 90
-    error_message = "The resource_group_name may not exceed 90 characters in length."
-  }
-  validation {
-    condition     = !can(regex("\\.$", var.resource_group_name))
-    error_message = "The resource_group_name may not end with a period."
-  }
-  validation {
-    condition     = can(regex("^[-\\w._()]+$", var.resource_group_name))
-    error_message = "The resource_group_name may only contain alphanumeric characters, dash, underscores, parentheses and periods."
-  }
-}
-
 variable "size" {
   type        = string
   description = "(Required) The SKU which should be used for this Virtual Machine, such as `Standard_F2`."
@@ -304,7 +285,6 @@ variable "automatic_updates_enabled" {
   type        = bool
   default     = true
   description = "(Optional) Specifies if Automatic Updates are Enabled for the Windows Virtual Machine. Changing this forces a new resource to be created. Defaults to `true`."
-  nullable    = false
 }
 
 variable "availability_set_id" {
@@ -648,8 +628,18 @@ variable "license_type" {
 
 variable "max_bid_price" {
   type        = number
-  default     = null
+  default     = -1
   description = "(Optional) The maximum price you're willing to pay for this Virtual Machine, in US Dollars; which must be greater than the current spot price. If this bid price falls below the current spot price the Virtual Machine will be evicted using the `eviction_policy`. Defaults to `-1`, which means that the Virtual Machine should not be evicted for price reasons."
+  nullable    = false
+
+  validation {
+    condition     = var.max_bid_price >= -1.0
+    error_message = "The max_bid_price must be at least -1.0."
+  }
+  validation {
+    condition     = var.max_bid_price <= 0 || try(var.priority == "Spot", false)
+    error_message = "max_bid_price can only be configured when priority is set to 'Spot'."
+  }
 }
 
 variable "os_image_notification" {
@@ -669,16 +659,137 @@ EOT
   }
 }
 
+variable "os_managed_disk_id" {
+  type        = string
+  default     = null
+  description = "(Optional) The ID of an existing Managed Disk which should be attached as the OS Disk of this Virtual Machine. If this is set, the Virtual Machine will be created using the 'Attach' option. When using an existing OS Disk, `source_image_id` and `source_image_reference` cannot be specified."
+
+  validation {
+    condition = (
+      var.os_managed_disk_id == null ||
+      can(regex("^/subscriptions/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/resourceGroups/.+/providers/Microsoft.Compute/disks/[^/]+$", var.os_managed_disk_id))
+    )
+    error_message = "The os_managed_disk_id must be a valid Managed Disk ID in the format: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/disks/{diskName}"
+  }
+  # ExactlyOneOf validation: os_managed_disk_id, source_image_id, source_image_reference
+  validation {
+    condition = (
+      (var.os_managed_disk_id != null && var.source_image_id == null && var.source_image_reference == null) ||
+      (var.os_managed_disk_id == null && var.source_image_id != null && var.source_image_reference == null) ||
+      (var.os_managed_disk_id == null && var.source_image_id == null && var.source_image_reference != null)
+    )
+    error_message = "Exactly one of os_managed_disk_id, source_image_id, or source_image_reference must be specified (ExactlyOneOf)."
+  }
+  # ConflictsWith validations
+  validation {
+    condition     = var.os_managed_disk_id == null || var.admin_password == null
+    error_message = "os_managed_disk_id cannot be used together with admin_password (ConflictsWith)."
+  }
+  validation {
+    condition     = var.os_managed_disk_id == null || var.admin_username == null
+    error_message = "os_managed_disk_id cannot be used together with admin_username (ConflictsWith)."
+  }
+  validation {
+    condition     = var.os_managed_disk_id == null || !var.bypass_platform_safety_checks_on_user_schedule_enabled
+    error_message = "os_managed_disk_id cannot be used together with bypass_platform_safety_checks_on_user_schedule_enabled (ConflictsWith)."
+  }
+  validation {
+    condition     = var.os_managed_disk_id == null || var.computer_name == null
+    error_message = "os_managed_disk_id cannot be used together with computer_name (ConflictsWith)."
+  }
+  validation {
+    condition     = var.os_managed_disk_id == null || var.custom_data == null
+    error_message = "os_managed_disk_id cannot be used together with custom_data (ConflictsWith)."
+  }
+  validation {
+    condition     = var.os_managed_disk_id == null || var.automatic_updates_enabled == null
+    error_message = "os_managed_disk_id cannot be used together with automatic_updates_enabled (ConflictsWith)."
+  }
+  validation {
+    condition     = var.os_managed_disk_id == null || try(var.enable_automatic_updates == null, true)
+    error_message = "os_managed_disk_id cannot be used together with enable_automatic_updates (ConflictsWith)."
+  }
+  validation {
+    condition     = var.os_managed_disk_id == null || var.hotpatching_enabled == null
+    error_message = "os_managed_disk_id cannot be used together with hotpatching_enabled (ConflictsWith)."
+  }
+  validation {
+    condition     = var.os_managed_disk_id == null || var.patch_mode == null
+    error_message = "os_managed_disk_id cannot be used together with patch_mode (ConflictsWith)."
+  }
+  validation {
+    condition     = var.os_managed_disk_id == null || var.patch_assessment_mode == null
+    error_message = "os_managed_disk_id cannot be used together with patch_assessment_mode (ConflictsWith)."
+  }
+  validation {
+    condition     = var.os_managed_disk_id == null || !var.provision_vm_agent
+    error_message = "os_managed_disk_id cannot be used together with provision_vm_agent (ConflictsWith)."
+  }
+  validation {
+    condition     = var.os_managed_disk_id == null || var.reboot_setting == null
+    error_message = "os_managed_disk_id cannot be used together with reboot_setting (ConflictsWith)."
+  }
+  validation {
+    condition     = var.os_managed_disk_id == null || var.timezone == null
+    error_message = "os_managed_disk_id cannot be used together with timezone (ConflictsWith)."
+  }
+  validation {
+    condition     = var.os_managed_disk_id == null || var.user_data == null
+    error_message = "os_managed_disk_id cannot be used together with user_data (ConflictsWith)."
+  }
+  validation {
+    condition     = var.os_managed_disk_id == null || try(length(var.additional_unattend_content) == 0, true)
+    error_message = "os_managed_disk_id cannot be used together with additional_unattend_content (ConflictsWith)."
+  }
+  validation {
+    condition     = var.os_managed_disk_id == null || try(length(var.gallery_application) == 0, true)
+    error_message = "os_managed_disk_id cannot be used together with gallery_application (ConflictsWith)."
+  }
+  validation {
+    condition     = var.os_managed_disk_id == null || try(length(var.secret) == 0, true)
+    error_message = "os_managed_disk_id cannot be used together with secret (ConflictsWith)."
+  }
+  validation {
+    condition     = var.os_managed_disk_id == null || try(length(var.winrm_listener) == 0, true)
+    error_message = "os_managed_disk_id cannot be used together with winrm_listener (ConflictsWith)."
+  }
+}
+
 variable "patch_assessment_mode" {
   type        = string
   default     = null
   description = "(Optional) Specifies the mode of VM Guest Patching for the Virtual Machine. Possible values are `AutomaticByPlatform` or `ImageDefault`. Defaults to `ImageDefault`."
+
+  validation {
+    condition = var.patch_assessment_mode == null || contains([
+      "AutomaticByPlatform",
+      "ImageDefault"
+    ], var.patch_assessment_mode)
+    error_message = "The patch_assessment_mode must be one of: AutomaticByPlatform, ImageDefault."
+  }
+  validation {
+    condition     = var.patch_assessment_mode != "AutomaticByPlatform" || var.provision_vm_agent != false
+    error_message = "`provision_vm_agent` must be set to `true` when `patch_assessment_mode` is set to `AutomaticByPlatform`."
+  }
 }
 
 variable "patch_mode" {
   type        = string
   default     = null
   description = "(Optional) Specifies the mode of in-guest patching to this Windows Virtual Machine. Possible values are `Manual`, `AutomaticByOS` and `AutomaticByPlatform`. Defaults to `AutomaticByOS`. For more information on patch modes please see the [product documentation](https://docs.microsoft.com/azure/virtual-machines/automatic-vm-guest-patching#patch-orchestration-modes)."
+
+  validation {
+    condition = var.patch_mode == null || contains([
+      "AutomaticByOS",
+      "AutomaticByPlatform",
+      "Manual"
+    ], var.patch_mode)
+    error_message = "The patch_mode must be one of: AutomaticByOS, AutomaticByPlatform, Manual."
+  }
+  validation {
+    condition     = var.patch_mode != "AutomaticByPlatform" || var.provision_vm_agent != false
+    error_message = "`patch_mode` cannot be set to `AutomaticByPlatform` when `provision_vm_agent` is set to `false`."
+  }
 }
 
 variable "plan" {
@@ -697,14 +808,41 @@ EOT
 
 variable "platform_fault_domain" {
   type        = number
-  default     = null
+  default     = -1
   description = "(Optional) Specifies the Platform Fault Domain in which this Windows Virtual Machine should be created. Defaults to `-1`, which means this will be automatically assigned to a fault domain that best maintains balance across the available fault domains. Changing this forces a new Windows Virtual Machine to be created."
+  nullable    = false
+
+  validation {
+    condition     = var.platform_fault_domain >= -1
+    error_message = "The platform_fault_domain must be at least -1."
+  }
+  validation {
+    condition     = var.platform_fault_domain == -1 || var.virtual_machine_scale_set_id != null
+    error_message = "When platform_fault_domain is set (not -1), virtual_machine_scale_set_id must also be set (RequiredWith)."
+  }
 }
 
 variable "priority" {
   type        = string
-  default     = null
+  default     = "Regular"
   description = "(Optional) Specifies the priority of this Virtual Machine. Possible values are `Regular` and `Spot`. Defaults to `Regular`. Changing this forces a new resource to be created."
+  nullable    = false
+
+  validation {
+    condition = contains([
+      "Regular",
+      "Spot"
+    ], var.priority)
+    error_message = "The priority must be either 'Regular' or 'Spot'."
+  }
+  validation {
+    condition     = var.priority != "Spot" || var.eviction_policy != null
+    error_message = "An `eviction_policy` must be specified when `priority` is set to `Spot`."
+  }
+  validation {
+    condition     = var.eviction_policy == null || var.priority == "Spot"
+    error_message = "An `eviction_policy` can only be specified when `priority` is set to `Spot`."
+  }
 }
 
 variable "provision_vm_agent" {
@@ -854,18 +992,24 @@ EOT
 
 variable "timeouts" {
   type = object({
-    create = optional(string)
-    delete = optional(string)
-    read   = optional(string)
-    update = optional(string)
+    create = optional(string, "45m")
+    delete = optional(string, "45m")
+    read   = optional(string, "5m")
+    update = optional(string, "45m")
   })
-  default     = null
+  default = {
+    create = "45m"
+    delete = "45m"
+    read   = "5m"
+    update = "45m"
+  }
   description = <<-EOT
- - `create` - 
- - `delete` - 
- - `read` - 
- - `update` - 
+ - `create` -  (Optional) Specifies the timeout for create operations. Defaults to 45 minutes.
+ - `delete` - (Optional) Specifies the timeout for delete operations. Defaults to 45 minutes.
+ - `read` - (Optional) Specifies the timeout for read operations. Defaults to 5 minutes.
+ - `update` - (Optional) Specifies the timeout for update operations. Defaults to 45 minutes.
 EOT
+  nullable    = false
 }
 
 variable "timezone" {

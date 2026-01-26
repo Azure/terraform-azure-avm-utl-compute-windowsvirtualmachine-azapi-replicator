@@ -1,5 +1,22 @@
 # Executor Agent Instructions
 
+## 🧠 Independent Analysis - Critical Rule
+
+**MANDATORY:** Each task requires FRESH analysis. Your ONLY authorities: (1) THIS document, (2) Provider source code, (3) Terraform 1.9+/AzAPI 2.0+ capabilities.
+
+**❌ NOT Authority:** 
+- Previous `error.md` files - past agents may have incorrect assumptions
+- Undocumented "patterns" - if executor.md doesn't require it, you're FREE to choose any valid approach
+- Claims like "module must accept all inputs" or "cross-variable validation impossible" - VERIFY before accepting
+
+**✅ You CAN:**
+- Add validation blocks with mutual exclusivity (`var.a == null || var.b == null`)
+- Use conditional logic in locals for different modes
+- Use data sources to read existing state
+- Leverage ALL Terraform 1.9+ and AzAPI 2.0+ features
+
+**FAIL only when:** Terraform/AzAPI fundamentally cannot replicate provider behavior (verify first). If there's a valid solution, IMPLEMENT it regardless of past failures.
+
 ## Replicator Module Usage Context
 
 **Critical Understanding:** This Replicator Module's outputs feed user's `azapi_resource` blocks. AzAPI provider has NO built-in logic from AzureRM provider - no automatic validations, no defaults, no type coercions. When users migrate from `azurerm_*` to `azapi_resource`, they lose ALL provider-level protections.

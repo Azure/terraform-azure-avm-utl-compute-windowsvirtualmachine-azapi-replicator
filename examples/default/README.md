@@ -76,7 +76,6 @@ module "replicator" {
     storage_account_type = "Standard_LRS"
   }
   resource_group_id      = azurerm_resource_group.test.id
-  resource_group_name    = azurerm_resource_group.test.name
   size                   = "Standard_F2"
   admin_password         = ephemeral.random_password.pass.result
   admin_password_version = 1

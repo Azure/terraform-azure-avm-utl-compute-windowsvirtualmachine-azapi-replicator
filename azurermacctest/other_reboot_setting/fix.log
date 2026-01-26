@@ -3,9 +3,9 @@ Test Case: other_reboot_setting
 
 Initial Error:
 creating/updating Resource: (ResourceId
-"/subscriptions/f7a632a5-49db-4c5e-9828-cd62cb753971/resourceGroups/acctestRG-124995/providers/Microsoft.Compute/virtualMachines/acctestvmby5ug"
+"/subscriptions//resourceGroups/acctestRG-124995/providers/Microsoft.Compute/virtualMachines/acctestvmby5ug"
 / Api Version "2024-03-01"): PUT
-https://management.azure.com/subscriptions/f7a632a5-49db-4c5e-9828-cd62cb753971/resourceGroups/acctestRG-124995/providers/Microsoft.Compute/virtualMachines/acctestvmby5ug
+https://management.azure.com/subscriptions//resourceGroups/acctestRG-124995/providers/Microsoft.Compute/virtualMachines/acctestvmby5ug
 --------------------------------------------------------------------------------
 RESPONSE 400: 400 Bad Request
 ERROR CODE: InvalidParameter

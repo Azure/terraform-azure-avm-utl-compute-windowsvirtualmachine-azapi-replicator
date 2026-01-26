@@ -6,7 +6,7 @@ Step 2 Failed - AzureRM Baseline Validation
 Failed Command: terraform apply -auto-approve -input=false
 
 Error Message:
-Error: creating Windows Virtual Machine (Subscription: "f7a632a5-49db-4c5e-9828-cd62cb753971"
+Error: creating Windows Virtual Machine (Subscription: ""
 Resource Group Name: "acctestRG-303471"
 Virtual Machine Name: "acctestvm4mkuv"): performing CreateOrUpdate: unexpected status 409 (409 Conflict) with error: SkuNotAvailable: The requested VM size for resource 'Following SKUs have failed for Capacity Restrictions: Standard_F2' is currently not available in location 'eastus'. Please try another size or deploy to a different location or different zone. See https://aka.ms/azureskunotavailable for details.
 

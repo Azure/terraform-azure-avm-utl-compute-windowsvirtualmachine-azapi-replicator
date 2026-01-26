@@ -2,7 +2,7 @@ Test Case: identity_system_assigned_user_assigned
 ================================================================================
 
 Initial Error:
-creating/updating Resource: creating/updating Resource: (ResourceId "/subscriptions/f7a632a5-49db-4c5e-9828-cd62cb753971/resourceGroups/acctestRG-428984/providers/Microsoft.Compute/virtualMachines/acctestvmt7da2" / Api Version "2024-03-01"): PUT https://management.azure.com/subscriptions/f7a632a5-49db-4c5e-9828-cd62cb753971/resourceGroups/acctestRG-428984/providers/Microsoft.Compute/virtualMachines/acctestvmt7da2
+creating/updating Resource: creating/updating Resource: (ResourceId "/subscriptions//resourceGroups/acctestRG-428984/providers/Microsoft.Compute/virtualMachines/acctestvmt7da2" / Api Version "2024-03-01"): PUT https://management.azure.com/subscriptions//resourceGroups/acctestRG-428984/providers/Microsoft.Compute/virtualMachines/acctestvmt7da2
 RESPONSE 400: 400 Bad Request
 ERROR CODE: MissingIdentityIds
 {

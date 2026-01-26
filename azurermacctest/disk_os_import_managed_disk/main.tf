@@ -47,6 +47,8 @@ resource "random_integer" "number" {
 
 locals {
   vm_name = "acctestvm${random_string.name.result}"
+  # Truncate name to 15 chars when using os_managed_disk_id
+  vm_name_short = substr("acctestvm${random_string.name.result}", 0, 15)
 }
 
 resource "azurerm_resource_group" "test" {
@@ -80,6 +82,12 @@ resource "azurerm_network_interface" "test" {
   }
 }
 
-data "azurerm_managed_disks" "test" {
-  resource_group_name = azurerm_resource_group.test.name
+resource "azurerm_managed_disk" "test" {
+  name                 = "acctestdisk-${random_integer.number.result}"
+  location             = azurerm_resource_group.test.location
+  resource_group_name  = azurerm_resource_group.test.name
+  storage_account_type = "Premium_LRS"
+  create_option        = "Empty"
+  disk_size_gb         = 50
+  os_type              = "Windows"
 }
