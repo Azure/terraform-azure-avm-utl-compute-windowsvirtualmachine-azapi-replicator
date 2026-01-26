@@ -1,0 +1,1 @@
+Test Case: disk_os_write_accelerator_enabled | Error: computer name cannot be more than 15 characters | Fix: Changed random_string length from 8 to 6 in main.tf | Result: Success (but test failed due to quota)

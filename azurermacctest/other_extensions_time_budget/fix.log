@@ -1,0 +1,32 @@
+Test Case: other_extensions_time_budget
+================================================================================
+
+Initial Error:
+Error: Missing required argument
+  on azapi.tf line 1, in module "replicator":
+   1: module "replicator" {
+The argument "resource_group_name" is required, but no definition was found.
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: The azapi.tf is using `resource_group_id` instead of `resource_group_name` which is the required parameter in the module
+- Fix Method: Changed `resource_group_id = azurerm_resource_group.test.id` to `resource_group_name = azurerm_resource_group.test.name`
+- Changes Made: Updated line 4 in azapi.tf from resource_group_id to resource_group_name with correct value
+- Result: Failure - Now missing resource_group_id
+
+Attempt 2:
+- Problem Analysis: The module requires BOTH resource_group_name and resource_group_id (verified by checking disk_os_basic test case)
+- Fix Method: Added resource_group_id back while keeping resource_group_name
+- Changes Made: Added line 5 in azapi.tf: resource_group_id = azurerm_resource_group.test.id
+- Result: Failure - Error: Attempt to get attribute from null value (identity.value is null)
+
+Attempt 3:
+- Problem Analysis: The identity dynamic block's for_each condition doesn't check for null values, causing error when identity.value is null
+- Fix Method: Added null check to the for_each condition
+- Changes Made: Updated line 44 condition from `can(module.replicator.azapi_header.identity) ? [...]` to `can(module.replicator.azapi_header.identity) && module.replicator.azapi_header.identity != null ? [...]`
+- Result: Success
+
+Final Result: Fix successful
+
+

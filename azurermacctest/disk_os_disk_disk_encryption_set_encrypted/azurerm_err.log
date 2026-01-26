@@ -1,0 +1,33 @@
+Test Case: disk_os_disk_disk_encryption_set_encrypted
+================================================================================
+
+Step 2 - Baseline Test Failed
+
+Initial Error:
+Computer name length constraint - VM name "acctestvm" + random string (8 chars) = 17 characters, exceeds 15 character limit for Windows computer names.
+
+Fix Attempted:
+Modified main.tf to reduce random_string.name length from 8 to 6 characters, making total VM name 15 characters (acctestvm + 6 chars).
+
+Result After Fix:
+Fixed the computer name issue but encountered a new error during apply:
+
+Error: updating Disk Encryption Set "acctestdes-221658" (Resource Group "acctestRG-221658"): performing Update: unexpected status 400 (400 Bad Request) with error: KeyVaultAccessForbidden: Unable to access key vault resource 'https://acctestkvtat4et.vault.azure.net/keys/examplekey/59f8297a58c8436ba43d65bead299042' to enable encryption at rest. Please grant get, wrap and unwrap key permissions to disk encryption set 'acctestdes-221658'. Please visit https://aka.ms/keyvaultac
+cessssecmk for more information.
+
+Root Cause Analysis:
+The test infrastructure has a dependency issue. When the random_string length changed, it forced recreation of:
+1. The random_string resource (id changed from "ixx89k6t" to "tat4et")
+2. The Key Vault (name depends on random_string: "acctestkvixx89k6t" -> "acctestkvtat4et")
+3. Key Vault access policies
+4. Key Vault key
+
+During the update process, Terraform tried to update the existing disk_encryption_set with the new key vault key URL before the proper access policies were fully established. The disk encryption set's managed identity needs get, wrap, and unwrap permissions on the new key vault, but these permissions weren't properly configured during the in-place update.
+
+This appears to be a fundamental issue with the test case's resource dependencies in main.tf when resources are recreated mid-apply. The azurerm_key_vault_access_policy.disk-encryption resource should have been created before the disk_encryption_set update, but the timing/dependency chain is broken during the partial recreation.
+
+Conclusion:
+The baseline AzureRM test is invalid due to infrastructure dependency issues that prevent successful application. The test case cannot proceed to validate AzAPI conversion since the baseline configuration itself is flawed.
+
+Recommendation:
+This test case requires main.tf to be refactored to handle resource recreation scenarios properly, or the random_string length should be fixed from the start to avoid triggering cascading recreations. Since main.tf cannot be modified per test guidelines (it's marked as trusted), this test case is fundamentally broken.

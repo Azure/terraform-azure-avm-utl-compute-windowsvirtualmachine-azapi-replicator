@@ -1,0 +1,33 @@
+Test Case: other_encryption_at_host_enabled_with_cmk
+================================================================================
+
+Initial Error:
+Missing required argument "resource_group_id" is required
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: The module call in azapi.tf is missing the required parameter resource_group_id
+- Fix Method: Add resource_group_id = azurerm_resource_group.test.id to the module call
+- Changes Made: Added line "resource_group_id   = azurerm_resource_group.test.id" after name parameter
+- Result: New error - validation failed
+
+Attempt 2:
+- Problem Analysis: When admin_password is set, admin_password_version must also be set (validation rule)
+- Fix Method: Add admin_password_version = 1 to the module call
+- Changes Made: Added line "admin_password_version  = 1" after admin_password
+- Result: New error - unsupported attribute
+
+Attempt 3:
+- Problem Analysis: azapi_resource block references non-existent module.replicator.identity - should be module.replicator.azapi_header.identity
+- Fix Method: Fix the dynamic identity block to reference the correct path
+- Changes Made: Changed [module.replicator.identity] to [module.replicator.azapi_header.identity] in for_each
+- Result: New error - null value
+
+Attempt 4:
+- Problem Analysis: The identity value is null, causing errors in the dynamic block's content. The can() function still evaluates null as truthy
+- Fix Method: Use try() with explicit null check instead of can()
+- Changes Made: Changed for_each condition from can() to try() != null
+- Result: Success - plan shows acceptable drifts only
+
+Final Result: Fix successful

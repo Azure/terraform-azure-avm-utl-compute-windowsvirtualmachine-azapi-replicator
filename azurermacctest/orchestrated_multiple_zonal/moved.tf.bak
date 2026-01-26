@@ -1,0 +1,9 @@
+moved {
+  from = azurerm_windows_virtual_machine.test
+  to   = azapi_resource.test
+}
+
+moved {
+  from = azurerm_windows_virtual_machine.another
+  to   = azapi_resource.another
+}

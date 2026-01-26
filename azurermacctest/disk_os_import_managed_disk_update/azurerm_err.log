@@ -1,0 +1,32 @@
+Test Case: disk_os_import_managed_disk_update
+================================================================================
+
+Step 2 Failed: Baseline AzureRM test failed
+
+Initial Error:
+Error: Invalid index
+
+  on azurerm.tf line 10, in resource "azurerm_windows_virtual_machine" "test":
+  10:   os_managed_disk_id = data.azurerm_managed_disks.test.disk.0.id
+    ├────────────────
+    │ data.azurerm_managed_disks.test.disk is empty list of object
+
+The given key does not identify an element in this collection value: the collection has no elements.
+
+Root Cause Analysis:
+This test case is attempting to reference a managed disk that doesn't exist in the resource group. The configuration uses `data.azurerm_managed_disks.test.disk.0.id` to import an existing managed disk into a new VM, but the data source returns an empty list because no managed disks exist in the newly created resource group.
+
+The test name "diskOSImportManagedDiskUpdate" suggests this is an UPDATE test case that depends on a previous test step or configuration that would have created the managed disk. This test cannot run as a standalone configuration.
+
+This is a test extraction/setup issue rather than a provider or module implementation issue. The test case requires:
+1. A pre-existing managed disk to be created (likely from a related test like "diskOSImportManagedDisk")
+2. The disk ID to be available before the VM can be created with `os_managed_disk_id`
+
+Conclusion:
+This test case is INVALID as a standalone test. It's designed as an update scenario within a multi-step test that would:
+1. First create a VM with a managed disk
+2. Then update that VM configuration
+
+The extracted test configuration is missing the initial setup step and therefore cannot be executed independently.
+
+Status: INVALID - Cannot run standalone, requires pre-existing managed disk

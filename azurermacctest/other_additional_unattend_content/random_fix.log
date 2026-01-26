@@ -1,0 +1,1 @@
+Test Case: other_additional_unattend_content | Error: computer_name cannot be more than 15 characters (got 17 with 'acctestvm' + 8 chars) | Fix: Changed random_string.name length from 8 to 5 | Result: Success

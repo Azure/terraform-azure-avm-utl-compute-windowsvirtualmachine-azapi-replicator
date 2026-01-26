@@ -1,0 +1,32 @@
+Test Case: networkMultiplePublicUpdated
+================================================================================
+
+Initial Error:
+Error: Missing required argument
+
+  on azapi.tf line 1, in module "replicator":
+   1: module "replicator" {
+
+The argument "resource_group_name" is required, but no definition was found.
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: Module call in azapi.tf is missing resource_group_name parameter which is required by the replicator module
+- Fix Method: Add resource_group_name parameter to the module call
+- Changes Made: Adding resource_group_name = azurerm_resource_group.test.name to the module call
+- Result: New error appeared - identity attribute not found in module output
+
+Attempt 2:
+- Problem Analysis: azapi_resource identity block references module.replicator.identity which doesn't exist - should use module.replicator.azapi_header.identity
+- Fix Method: Fix the identity block reference in the dynamic block
+- Changes Made: Changed for_each from [module.replicator.identity] to [module.replicator.azapi_header.identity]
+- Result: New error - identity.value is null
+
+Attempt 3:
+- Problem Analysis: Using can() function doesn't properly check for null values, causing the for_each to iterate when identity is null
+- Fix Method: Change condition from can() to != null check
+- Changes Made: Changed for_each condition from can(module.replicator.azapi_header.identity) to module.replicator.azapi_header.identity != null
+- Result: Success - Plan shows acceptable drift (API version change from @2025-04-01 to @2024-03-01)
+
+Final Result: Fix successful

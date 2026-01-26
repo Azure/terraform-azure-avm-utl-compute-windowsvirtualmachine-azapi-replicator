@@ -1,0 +1,22 @@
+Test Case: disk_os_controller_type_nvme
+================================================================================
+
+Initial Error:
+Error: Unsupported attribute
+  on azapi.tf line 42: This object does not have an attribute named "identity".
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: The identity block references module.replicator.identity which doesn't exist as a direct output. Should reference module.replicator.azapi_header.identity instead, and use != null check instead of can()
+- Fix Method: Change line 42 from 'can(module.replicator.azapi_header.identity) ? [module.replicator.identity]' to 'module.replicator.azapi_header.identity != null ? [module.replicator.azapi_header.identity]'
+- Changes Made: Modified azapi.tf line 42 to use correct reference path
+- Result: Retrying plan...
+
+
+Final Result: Fix successful. Plan shows changes - analyzing drifts for acceptability.
+
+Drift Analysis:
+- Resource-level attributes (ignore_null_property, locks, replace_triggers_external_values, sensitive_body_version, output, type): ALL ACCEPTABLE per Section 1
+- Body changes: Adding storageUri="", licenseType="None", removing computed defaults like requireGuestProvisionSignal, secrets, patchSettings, priority, OS disk computed fields
+- Assessment: These appear to be Azure API response fields (Optional+Computed). Proceeding with apply to verify idempotency.

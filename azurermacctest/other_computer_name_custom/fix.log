@@ -1,0 +1,39 @@
+Test Case: other_computer_name_custom
+================================================================================
+
+Initial Error:
+Error: Missing required argument
+  on azapi.tf line 1, in module "replicator":
+   1: module "replicator" {
+The argument "resource_group_id" is required, but no definition was found.
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: The module call is missing the required parameter 'resource_group_id'
+- Fix Method: Add resource_group_id parameter to module call using azurerm_resource_group.test.id
+- Changes Made: Added resource_group_id = azurerm_resource_group.test.id to module replicator block
+- Result: New error - admin_password_version must be set
+
+Attempt 2:
+- Problem Analysis: The module requires admin_password_version when admin_password is provided
+- Fix Method: Add admin_password_version = 1 to module call
+- Changes Made: Added admin_password_version = 1 to module replicator block
+- Result: New error - module.replicator.identity attribute doesn't exist
+
+Attempt 3:
+- Problem Analysis: The identity block is referencing module.replicator.identity incorrectly
+- Fix Method: Change identity references to use module.replicator.azapi_header.identity
+- Changes Made: Updated dynamic identity block to reference azapi_header.identity
+- Result: Success - terraform plan executed successfully
+
+Final Result: Fix successful after 3 attempts
+
+Summary: Fixed three issues:
+1. Added missing resource_group_id parameter
+2. Added required admin_password_version parameter
+3. Fixed identity block to reference azapi_header.identity
+
+All detected drifts in the plan are acceptable according to acceptable_drift_patterns.md:
+- Resource-level attribute changes (ignore_null_property, locks, replace_triggers, etc.)
+- Body changes removing Azure API computed default values

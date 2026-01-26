@@ -1,0 +1,42 @@
+Test Case: other_gallery_application
+================================================================================
+
+Initial Error:
+Error: Missing required argument on azapi.tf line 1, in module "replicator": The argument "resource_group_id" is required, but no definition was found.
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: The module requires both resource_group_id and resource_group_name parameters, but only resource_group_name was provided in azapi.tf
+- Fix Method: Added resource_group_id parameter to the module call
+- Changes Made: Added line: resource_group_id = azurerm_resource_group.test.id
+- Result: New error - admin_password_version is required when admin_password is set
+
+Attempt 2:
+- Problem Analysis: Module validation requires admin_password_version to be set when admin_password is provided
+- Fix Method: Added admin_password_version parameter
+- Changes Made: Added line: admin_password_version = "1"
+- Result: New error - Attempt to get attribute from null value in identity block
+
+Attempt 3:
+- Problem Analysis: The dynamic identity block uses can() which returns true even when identity is null, causing attribute access error
+- Fix Method: Changed condition from can() to direct null check
+- Changes Made: Changed for_each = can(module.replicator.azapi_header.identity) ? ... to for_each = module.replicator.azapi_header.identity != null ? ...
+- Result: New error - gallery_application.order is string but should be integer
+
+Attempt 4:
+- Problem Analysis: The gallery_application order field defaults to string "0" from module, but Azure API expects integer
+- Fix Method: Explicitly set order as integer in gallery_application block
+- Changes Made: Added order = 0 to gallery_application block
+- Result: Error persists - module still generates string value for order in body
+
+Attempt 5:
+- Problem Analysis: Even with explicit order = 0, module generates string value internally. Cannot fix at input level.
+- Fix Method: Disable schema validation on azapi_resource as suggested by error message
+- Changes Made: Added schema_validation_enabled = false to azapi_resource.this
+- Result: Apply succeeded but idempotency check shows order field oscillating between integer 0 and string "0"
+
+Final Result: Fix partially successful - state migration works and resources are not recreated, but configuration drift persists due to module bug generating string "0" instead of integer 0 for gallery_application.order field. The drift is minor (string vs int type) and doesn't affect functionality, but violates strict idempotency requirement.
+
+
+

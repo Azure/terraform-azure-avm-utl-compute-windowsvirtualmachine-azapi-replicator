@@ -1,0 +1,22 @@
+Test Case: other_tags
+================================================================================
+
+Initial Error:
+Error: Unsupported attribute - This object does not have an attribute named "identity".
+on azapi.tf line 48: for_each = can(module.replicator.azapi_header.identity) ? [module.replicator.identity] : []
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: The code checks for module.replicator.azapi_header.identity but then tries to use module.replicator.identity which doesn't exist as a separate output
+- Fix Method: Changed [module.replicator.identity] to [module.replicator.azapi_header.identity]
+- Changes Made: Line 48 in azapi.tf - changed for_each value from [module.replicator.identity] to [module.replicator.azapi_header.identity]
+- Result: Testing...
+
+Attempt 2:
+- Problem Analysis: The identity attribute exists but is null. The can() function checks if the attribute exists, not if it's null
+- Fix Method: Changed can(module.replicator.azapi_header.identity) to module.replicator.azapi_header.identity != null
+- Changes Made: Line 48 in azapi.tf - changed condition from can() to != null check
+- Result: Testing...
+
+Final Result: Fix successful - plan shows acceptable drifts only

@@ -1,0 +1,26 @@
+Test Case: orchestrated_non_zonal
+================================================================================
+
+Initial Error:
+Error: Unsupported attribute
+  on azapi.tf line 46, in resource "azapi_resource" "this":
+  46:     for_each = can(module.replicator.azapi_header.identity) ? [module.replicator.identity] : []
+     ├────────────────
+     │ module.replicator is object with 8 attributes
+This object does not have an attribute named "identity".
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: The code checks for module.replicator.azapi_header.identity but tries to use module.replicator.identity which doesn't exist. Identity is part of azapi_header output.
+- Fix Method: Changed line 46 from [module.replicator.identity] to [module.replicator.azapi_header.identity]
+- Changes Made: Updated azapi.tf line 46 to reference module.replicator.azapi_header.identity
+- Result: Failure - new error "Attempt to get attribute from null value"
+
+Attempt 2:
+- Problem Analysis: The can() function checks if an attribute exists, not if it's null. When identity is null, for_each creates [null], causing identity.value.type to fail.
+- Fix Method: Changed condition from can(module.replicator.azapi_header.identity) to module.replicator.azapi_header.identity != null
+- Changes Made: Updated line 46 condition to module.replicator.azapi_header.identity != null
+- Result: Success - plan shows only acceptable drifts, apply succeeded, idempotency verified
+
+Final Result: Fix successful

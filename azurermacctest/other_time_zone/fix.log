@@ -1,0 +1,38 @@
+Test Case: other_time_zone
+================================================================================
+
+Initial Error:
+Error: Missing required argument
+│
+│   on azapi.tf line 1, in module "replicator":
+│    1: module "replicator" {
+│
+│ The argument "resource_group_name" is required, but no definition was found.
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: Module uses resource_group_id instead of required resource_group_name parameter
+- Fix Method: Changed module parameter from resource_group_id to resource_group_name
+- Changes Made: 
+  * Changed: resource_group_id = azurerm_resource_group.test.id
+  * To: resource_group_name = azurerm_resource_group.test.name
+- Result: Still failed - module requires BOTH parameters
+
+Attempt 2:
+- Problem Analysis: Module requires both resource_group_name and resource_group_id
+- Fix Method: Added resource_group_id back while keeping resource_group_name
+- Changes Made: 
+  * Added: resource_group_id = azurerm_resource_group.test.id
+  * Kept: resource_group_name = azurerm_resource_group.test.name
+- Result: New error - identity.value is null
+
+Attempt 3:
+- Problem Analysis: Dynamic identity block uses can() which doesn't properly check for null values
+- Fix Method: Changed from can() to try() with null check
+- Changes Made: 
+  * Changed: for_each = can(module.replicator.azapi_header.identity) ? [module.replicator.azapi_header.identity] : []
+  * To: for_each = try(module.replicator.azapi_header.identity, null) != null ? [module.replicator.azapi_header.identity] : []
+- Result: Success
+
+Final Result: Fix successful. Plan showed acceptable drifts, apply completed, idempotency verified.

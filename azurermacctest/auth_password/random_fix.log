@@ -1,0 +1,1 @@
+Test Case: auth_password | Error: computer name cannot be more than 15 characters (got 17 from acctestvm + 8 random chars) | Fix: Reduced random_string length from 8 to 6 | Result: Success

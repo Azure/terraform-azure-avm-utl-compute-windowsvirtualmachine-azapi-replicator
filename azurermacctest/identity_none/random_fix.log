@@ -1,0 +1,5 @@
+Test Case: identity_none
+Error: unable to assume default computer_name - name can be at most 15 characters, got 17
+Fix: Reduced random_string length from 8 to 5 (acctestvm + 5 chars = 14 chars)
+Result: Retrying apply
+

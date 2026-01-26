@@ -1,0 +1,1 @@
+Test Case: disk_os_ephemeral_default | Error: computer name cannot be more than 15 characters (got 18) | Fix: Reduced random_string length from 8 to 5 (acctestvm + 5 = 15 chars) | Result: Success

@@ -1,0 +1,21 @@
+Test Case: scaling_proximity_placement_group
+================================================================================
+
+Initial Error:
+Error: Attempt to get attribute from null value
+  on azapi.tf line 47, in resource "azapi_resource" "this":
+  47:       type         = identity.value.type
+     ├────────────────
+     │ identity.value is null
+
+This value is null, so it does not have any attributes.
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: The dynamic identity block check used can() which passes even for null values
+- Fix Method: Change for_each condition from can(module.replicator.azapi_header.identity) to module.replicator.azapi_header.identity != null
+- Changes Made: Updated azapi.tf line 45 to use != null check instead of can()
+- Result: Success - plan now runs. Plan shows acceptable drifts only (ignore_null_property, locks, replace_triggers, sensitive_body_version, output, type, and computed default values in body)
+
+Final Result: Fix successful

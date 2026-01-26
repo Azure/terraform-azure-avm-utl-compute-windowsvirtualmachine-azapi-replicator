@@ -1,0 +1,22 @@
+Test Case: scaling_capacity_reservation_group
+================================================================================
+
+Initial Error:
+Error: Attempt to get attribute from null value
+│
+│   on azapi.tf line 47, in resource "azapi_resource" "this":
+│   47:       type         = identity.value.type
+│     ├────────────────
+│     │ identity.value is null
+│
+│ This value is null, so it does not have any attributes.
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: The dynamic identity block uses can() which returns true even when identity is null
+- Fix Method: Change condition from can(module.replicator.azapi_header.identity) to module.replicator.azapi_header.identity != null
+- Changes Made: Line 45 in azapi.tf
+- Result: Success - plan now shows only acceptable drift patterns
+
+Final Result: Fix successful

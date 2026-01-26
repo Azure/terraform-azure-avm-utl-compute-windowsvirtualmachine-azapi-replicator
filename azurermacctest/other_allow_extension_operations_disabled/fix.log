@@ -1,0 +1,28 @@
+Test Case: other_allow_extension_operations_disabled
+================================================================================
+
+Initial Error:
+Error: Missing required argument
+The argument "resource_group_name" is required, but no definition was found.
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: azapi.tf was using resource_group_id instead of resource_group_name
+- Fix Method: Changed resource_group_id = azurerm_resource_group.test.id to resource_group_name = azurerm_resource_group.test.name
+- Changes Made: Updated module parameter in azapi.tf line 5
+- Result: Failed - now missing resource_group_id
+
+Attempt 2:
+- Problem Analysis: Module requires BOTH resource_group_name and resource_group_id (from variables.tf and migrate_variables.tf)
+- Fix Method: Added resource_group_id = azurerm_resource_group.test.id alongside resource_group_name
+- Changes Made: Added resource_group_id parameter to module in azapi.tf
+- Result: Failed - Error: Attempt to get attribute from null value in identity block
+
+Attempt 3:
+- Problem Analysis: The dynamic identity block for_each condition checks can() but doesn't filter null values
+- Fix Method: Added null check to for_each condition: && module.replicator.azapi_header.identity != null
+- Changes Made: Updated for_each in identity dynamic block in azapi.tf line 45
+- Result: Success - Plan shows acceptable drifts only (ignore_null_property, locks, replace_triggers_external_values, sensitive_body_version, output, type API version change, and body changes that are Optional+Computed fields per Pattern 2)
+
+Final Result: Fix successful

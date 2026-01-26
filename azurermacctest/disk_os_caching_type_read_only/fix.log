@@ -1,0 +1,20 @@
+Test Case: disk_os_caching_type_read_only
+================================================================================
+
+Initial Error:
+Error: Attempt to get attribute from null value
+  on azapi.tf line 49, in resource "azapi_resource" "this":
+  49:       type         = identity.value.type
+     ├────────────────
+     │ identity.value is null
+This value is null, so it does not have any attributes.
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: The dynamic identity block uses can() to check if identity exists, but can() returns true for null values. The azurerm.tf.bak shows no identity block, so identity should not be included in azapi_resource
+- Fix Method: Changed identity for_each condition from can(module.replicator.azapi_header.identity) to module.replicator.azapi_header.identity != null
+- Changes Made: Modified line 47 in azapi.tf to use != null check instead of can()
+- Result: Success - plan now shows acceptable drift only (AzAPI metadata attributes and removed computed defaults)
+
+Final Result: Fix successful

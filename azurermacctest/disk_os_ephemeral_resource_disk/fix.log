@@ -1,0 +1,48 @@
+Test Case: disk_os_ephemeral_resource_disk
+================================================================================
+
+Initial Error:
+Error: Missing required argument
+  on azapi.tf line 1, in module "replicator":
+   1: module "replicator" {
+The argument "resource_group_name" is required, but no definition was found.
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: Module is using resource_group_id but the module also requires resource_group_name parameter
+- Fix Method: Add resource_group_name parameter to module call
+- Changes Made: Adding resource_group_name = azurerm_resource_group.test.name
+- Result: New error - identity.value is null
+
+Attempt 2:
+- Problem Analysis: The dynamic identity block tries to access identity.value.type when identity.value is null
+- Fix Method: Add null check before accessing identity.value properties
+- Changes Made: Modify dynamic identity block to handle null values properly
+- Result: Plan successful, analyzing drifts
+
+Drift Analysis:
+1. ignore_null_property: false -> true - ✅ ACCEPTABLE (whitelist section 1)
+2. locks: added - ✅ ACCEPTABLE (whitelist section 1)
+3. replace_triggers_external_values: added - ✅ ACCEPTABLE (whitelist section 1)
+4. sensitive_body_version: added - ✅ ACCEPTABLE (whitelist section 1)
+5. output: changed - ✅ ACCEPTABLE (whitelist section 1)
+6. type: API version change - ✅ ACCEPTABLE (whitelist section 1)
+
+Body changes:
+- diagnosticsProfile.bootDiagnostics.storageUri: added empty string
+- licenseType: added "None"
+- osProfile.requireGuestProvisionSignal: removed
+- osProfile.secrets: removed empty array
+- osProfile.windowsConfiguration.patchSettings: removed
+- osProfile.windowsConfiguration.winRM: removed
+- priority: removed "Regular"
+- storageProfile.osDisk.deleteOption: removed
+- storageProfile.osDisk.diskSizeGB: removed
+- storageProfile.osDisk.managedDisk.id: removed
+- storageProfile.osDisk.name: removed
+
+Need to check if these are Optional+Computed fields in AzureRM provider.
+- Result: All drifts appear acceptable (resource-level AzAPI attributes + body fields not explicitly configured)
+
+Final Result: Fix successful

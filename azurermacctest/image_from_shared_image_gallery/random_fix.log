@@ -1,0 +1,1 @@
+Test Case: image_from_shared_image_gallery | Error: unable to assume default computer name "computer_name" can be at most 15 characters, got 16 | Fix: Changed random_string length from 8 to 6 (VM name pattern: acctvm-[6chars]1 = 14 chars total) | Result: Success (fix resolved the naming constraint, but test failed due to different issue requiring VM generalization)

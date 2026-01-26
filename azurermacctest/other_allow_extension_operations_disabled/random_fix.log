@@ -1,0 +1,1 @@
+Test Case: other_allow_extension_operations_disabled | Error: computer_name can be at most 15 characters, got 17 | Fix: Changed random_string length from 8 to 6 (acctestvm = 9 chars + 6 random = 15 total) | Result: Retrying apply

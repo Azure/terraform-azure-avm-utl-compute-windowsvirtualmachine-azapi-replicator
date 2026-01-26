@@ -1,0 +1,165 @@
+terraform {
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "~> 4.0"
+    }
+    azapi = {
+      source  = "Azure/azapi"
+      version = "~> 2.0"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.0"
+    }
+  }
+}
+
+provider "azurerm" {
+  features {
+    resource_group {
+      prevent_deletion_if_contains_resources = false
+    }
+    key_vault {
+      purge_soft_delete_on_destroy    = true
+      recover_soft_deleted_key_vaults = true
+    }
+  }
+}
+
+provider "azapi" {}
+
+provider "random" {}
+
+resource "random_string" "name" {
+  length  = 6
+  special = false
+  upper   = false
+}
+
+resource "random_integer" "number" {
+  min = 100000
+  max = 999999
+}
+
+locals {
+  vm_name = "acctvm-${random_string.name.result}"
+}
+
+resource "azurerm_resource_group" "test" {
+  name     = "acctestRG-${random_integer.number.result}"
+  location = "eastus"
+}
+
+resource "azurerm_virtual_network" "test" {
+  name                = "acctestnw-${random_integer.number.result}"
+  address_space       = ["10.0.0.0/16"]
+  location            = azurerm_resource_group.test.location
+  resource_group_name = azurerm_resource_group.test.name
+}
+
+resource "azurerm_subnet" "test" {
+  name                 = "internal"
+  resource_group_name  = azurerm_resource_group.test.name
+  virtual_network_name = azurerm_virtual_network.test.name
+  address_prefixes     = ["10.0.2.0/24"]
+}
+
+resource "azurerm_public_ip" "test" {
+  name                = "acctpip-${random_integer.number.result}"
+  location            = azurerm_resource_group.test.location
+  resource_group_name = azurerm_resource_group.test.name
+  allocation_method   = "Static"
+  domain_name_label   = local.vm_name
+}
+
+resource "azurerm_network_interface" "public" {
+  name                = "acctnicsource-${random_integer.number.result}"
+  location            = azurerm_resource_group.test.location
+  resource_group_name = azurerm_resource_group.test.name
+
+  ip_configuration {
+    name                          = "testconfigurationsource"
+    subnet_id                     = azurerm_subnet.test.id
+    private_ip_address_allocation = "Dynamic"
+    public_ip_address_id          = azurerm_public_ip.test.id
+  }
+}
+
+resource "azurerm_network_interface" "test" {
+  name                = "acctestnic-${random_integer.number.result}"
+  location            = azurerm_resource_group.test.location
+  resource_group_name = azurerm_resource_group.test.name
+
+  ip_configuration {
+    name                          = "internal"
+    subnet_id                     = azurerm_subnet.test.id
+    private_ip_address_allocation = "Dynamic"
+  }
+}
+
+resource "azurerm_windows_virtual_machine" "source" {
+  name                = "${local.vm_name}1"
+  resource_group_name = azurerm_resource_group.test.name
+  location            = azurerm_resource_group.test.location
+  size                = "Standard_F2"
+  admin_username      = "adminuser"
+  admin_password      = "P@$$w0rd1234!"
+  network_interface_ids = [
+    azurerm_network_interface.public.id,
+  ]
+
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
+
+  source_image_reference {
+    publisher = "MicrosoftWindowsServer"
+    offer     = "WindowsServer"
+    sku       = "2016-Datacenter"
+    version   = "latest"
+  }
+}
+
+resource "azurerm_shared_image_gallery" "test" {
+  name                = "acctestsig${random_integer.number.result}"
+  resource_group_name = azurerm_resource_group.test.name
+  location            = azurerm_resource_group.test.location
+}
+
+resource "azurerm_image" "test" {
+  name                      = "capture"
+  location                  = azurerm_resource_group.test.location
+  resource_group_name       = azurerm_resource_group.test.name
+  source_virtual_machine_id = azurerm_windows_virtual_machine.source.id
+}
+
+resource "azurerm_shared_image" "test" {
+  name                = "acctest-gallery-image"
+  gallery_name        = azurerm_shared_image_gallery.test.name
+  resource_group_name = azurerm_resource_group.test.name
+  location            = azurerm_resource_group.test.location
+  os_type             = "Windows"
+
+  identifier {
+    publisher = "AcceptanceTest-Publisher"
+    offer     = "AcceptanceTest-Offer"
+    sku       = "AcceptanceTest-Sku"
+  }
+}
+
+resource "azurerm_shared_image_version" "test" {
+  name                = "0.0.1"
+  gallery_name        = azurerm_shared_image.test.gallery_name
+  image_name          = azurerm_shared_image.test.name
+  resource_group_name = azurerm_shared_image.test.resource_group_name
+  location            = azurerm_shared_image.test.location
+  managed_image_id    = azurerm_image.test.id
+
+  target_region {
+    name                   = azurerm_shared_image.test.location
+    regional_replica_count = "5"
+    storage_account_type   = "Standard_LRS"
+  }
+}

@@ -1,0 +1,53 @@
+Test Case: scaling_dedicated_host_group_removed
+================================================================================
+
+Step 2 (Baseline AzureRM Test) Failed - Test Marked as INVALID
+
+Failed Command:
+terraform apply -auto-approve -input=false
+
+Root Cause:
+Azure subscription quota limitation - insufficient cores for dedicated host deployment.
+
+Error Details:
+1. Primary Error: Quota Exceeded
+   - Resource: Dedicated Host (azurerm_dedicated_host.second)
+   - Required: 80 cores for standardDSv3Family
+   - Current Limit: 65 cores
+   - Current Usage: 0 cores
+   - Location: eastus
+   
+   Full Error Message:
+   "Operation could not be completed as it results in exceeding approved standardDSv3Family 
+   Cores quota. Additional details - Deployment Model: Resource Manager, Location: eastus, 
+   Current Limit: 65, Current Usage: 0, Additional Required: 80, (Minimum) New Limit Required: 80."
+
+2. Secondary Error: Computer Name Validation
+   - Resource: azurerm_windows_virtual_machine.test
+   - Error: "unable to assume default computer name 'computer_name' can be at most 15 characters, got 17"
+   - Note: This is a random resource generation issue, but is not the primary blocker
+
+Analysis:
+This test case requires creating an Azure Dedicated Host with Standard_D2s_v3 SKU, which requires 
+80 cores of standardDSv3Family quota. The test subscription only has a quota of 65 cores, making 
+it impossible to create the required infrastructure.
+
+This is consistent with other dedicated host tests in this test suite:
+- scalingDedicatedHost: invalid (quota exceeded: 80 cores required, limit 65)
+- scalingDedicatedHostUpdate: invalid (quota exceeded: 80 cores for 2 hosts, limit 65)
+- scalingDedicatedHostRemoved: invalid (quota exceeded: 80 cores required, limit 65)
+- scalingDedicatedHostGroup: invalid (quota exceeded: 80 cores required, limit 65)
+- scalingDedicatedHostGroupUpdate: invalid (quota exceeded: 80 cores for 2 hosts, limit 65)
+
+Conclusion:
+The test case cannot be executed due to Azure subscription quota constraints. The test is marked 
+as INVALID because the baseline AzureRM configuration cannot be deployed successfully, which is a 
+prerequisite for testing the AzAPI conversion.
+
+Recommendation:
+To execute this test case, the Azure subscription would need a quota increase for standardDSv3Family 
+cores from 65 to at least 80 cores in the eastus region.
+
+Cleanup Status:
+Successfully destroyed all partially created resources (resource group, network resources, dedicated host group).
+No orphaned resources remaining.

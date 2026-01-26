@@ -1,0 +1,10 @@
+Test Case: other_gallery_application
+================================================================================
+
+Error: unable to assume default computer name "computer_name" can be at most 15 characters, got 17.
+
+Fix: Reduced random_string length from 8 to 6 characters in main.tf
+- Changed: resource "random_string" "name" { length = 8 } to { length = 6 }
+- Reason: VM name "acctestvmeaxc70" (acctestvm + 6 chars) = 15 characters total, which meets the computer_name limit
+
+Result: Success - apply completed and plan shows no changes

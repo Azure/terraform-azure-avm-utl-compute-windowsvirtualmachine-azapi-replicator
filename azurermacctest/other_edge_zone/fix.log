@@ -1,0 +1,25 @@
+Test Case: other_edge_zone
+================================================================================
+
+Initial Error:
+Error: Attempt to get attribute from null value
+  on azapi.tf line 47, in resource "azapi_resource" "this":
+  47:       type         = identity.value.type
+    ├────────────────
+    │ identity.value is null
+This value is null, so it does not have any attributes.
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: The dynamic "identity" block uses can() to check if module.replicator.azapi_header.identity exists, but can() returns true even when the value is null. When identity is null, for_each creates [null], then accessing identity.value.type fails.
+- Fix Method: Add explicit null check in addition to can() check
+- Changes Made: Modified line 45 from `for_each = can(module.replicator.azapi_header.identity) ? [module.replicator.azapi_header.identity] : []` to `for_each = can(module.replicator.azapi_header.identity) && module.replicator.azapi_header.identity != null ? [module.replicator.azapi_header.identity] : []`
+- Result: Success - plan succeeded with acceptable drifts
+
+Drift Analysis:
+All detected drifts are acceptable per acceptable_drift_patterns.md:
+1. Resource-level attribute changes (Pattern 1): ignore_null_property, locks, output, replace_triggers_external_values, sensitive_body_version, type (API version) - ALL ACCEPTABLE
+2. Body changes: Added storageUri="", licenseType="None", removed computed default fields (requireGuestProvisionSignal, secrets, patchSettings, winRM, priority, deleteOption, diskSizeGB, managedDisk.id, name) - These are Azure API response fields marked as Optional+Computed in AzureRM, acceptable per Pattern 2
+
+Final Result: Fix successful - proceeding to apply

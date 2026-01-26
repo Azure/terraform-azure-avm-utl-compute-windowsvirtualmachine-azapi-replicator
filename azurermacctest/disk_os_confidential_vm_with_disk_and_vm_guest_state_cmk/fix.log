@@ -1,0 +1,22 @@
+Test Case: disk_os_confidential_vm_with_disk_and_vm_guest_state_cmk
+================================================================================
+
+Initial Error:
+Error: Unsupported attribute
+on azapi.tf line 53: This object does not have an attribute named "identity".
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: The code was checking for module.replicator.azapi_header.identity but then referencing module.replicator.identity which doesn't exist
+- Fix Method: Changed line 53 from `[module.replicator.identity]` to `[module.replicator.azapi_header.identity]`
+- Changes Made: Updated azapi.tf line 53
+- Result: New error - identity.value is null
+
+Attempt 2:
+- Problem Analysis: can() returns true even when the value is null. Need to explicitly check for non-null
+- Fix Method: Changed condition from `can(module.replicator.azapi_header.identity)` to `try(module.replicator.azapi_header.identity != null ? [...] : [], [])`
+- Changes Made: Updated azapi.tf line 53
+- Result: Plan succeeded with acceptable drifts (AzAPI attributes and computed values)
+
+Final Result: Fix successful

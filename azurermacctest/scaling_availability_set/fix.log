@@ -1,0 +1,16 @@
+Test Case: scaling_availability_set
+================================================================================
+
+Initial Error:
+Error: Unsupported attribute on azapi.tf line 45
+This object does not have an attribute named "identity".
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: The check `can(module.replicator.azapi_header.identity)` is incorrect - should check `module.replicator.identity` directly
+- Fix Method: Changed line 45 from `can(module.replicator.azapi_header.identity)` to `can(module.replicator.identity)`
+- Changes Made: Modified azapi.tf line 45
+- Result: Success - Plan now runs successfully and shows only acceptable drifts
+
+Final Result: Fix successful

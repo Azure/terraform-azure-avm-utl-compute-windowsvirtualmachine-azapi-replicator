@@ -1,0 +1,29 @@
+Test Case: scalingProximityPlacementGroupUpdate
+================================================================================
+
+Initial Error:
+Error: Attempt to get attribute from null value - identity.value is null
+
+Fix Process:
+
+
+Attempt 1:
+- Problem Analysis: The dynamic identity block uses can() which returns true even for null values
+- Fix Method: Changed from can(module.replicator.azapi_header.identity) to module.replicator.azapi_header.identity != null
+- Changes Made: Modified line 45 in azapi.tf to properly check for null identity
+- Result: Testing...
+
+
+Attempt 1 Result: Success - terraform plan succeeded
+
+Drift Analysis:
+All detected drifts are acceptable:
+1. AzAPI resource-level attributes (ignore_null_property, locks, replace_triggers_external_values, sensitive_body_version, output, type) - Pattern #1
+2. Body changes are all Azure API computed/default values being removed due to ignore_null_property = true - Pattern #2
+
+Proceeding with apply to verify idempotency...
+
+
+Final Result: Fix successful - terraform plan showed no changes after apply
+
+

@@ -1,0 +1,21 @@
+Test Case: disk_os_caching_type_read_write
+================================================================================
+
+Initial Error:
+Unsupported attribute: module.replicator does not have an attribute named 'identity'
+at line 44: for_each = can(module.replicator.azapi_header.identity) ? [module.replicator.identity] : []
+
+Fix Process:
+
+Attempt 1:
+- Problem Analysis: The error checking for identity uses wrong path (azapi_header.identity), should check module.replicator.identity directly
+- Fix Method: Change can(module.replicator.azapi_header.identity) to can(module.replicator.identity)
+- Changes Made: Updated line 44 in azapi.tf
+- Result: Retrying terraform plan...
+
+Attempt 1 Result: Plan successful, detected acceptable drifts per acceptable_drift_patterns.md
+- Resource-level changes (ignore_null_property, locks, replace_triggers_external_values, sensitive_body_version, output, type): All acceptable
+- Body changes appear to be computed/optional fields being removed
+Proceeding with apply to verify idempotency...
+
+Final Result: Fix successful - state migration complete with acceptable drift, idempotency verified

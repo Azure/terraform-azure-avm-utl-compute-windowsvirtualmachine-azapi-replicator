@@ -1,0 +1,4 @@
+Test Case: other_hotpatching_disabled
+Error: unable to assume default computer name "computer_name" can be at most 15 characters, got 17
+Fix: Changed random_string length from 8 to 5 in main.tf (acctestvm + 5 chars = 13 chars <= 15)
+Result: Success
