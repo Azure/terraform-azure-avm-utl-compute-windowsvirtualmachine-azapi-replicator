@@ -51,7 +51,7 @@ resource "azurerm_network_interface" "test" {
   }
 }
 
-ephemeral random_password "pass" {
+ephemeral "random_password" "pass" {
   length      = 20
   lower       = true
   min_lower   = 1
