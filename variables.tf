@@ -1,5 +1,6 @@
 # New variables only
 
+
 variable "location" {
   type        = string
   description = "(Required) The Azure location where the Windows Virtual Machine should exist. Changing this forces a new resource to be created."
@@ -200,9 +201,9 @@ variable "additional_unattend_content_version" {
 
 variable "admin_password" {
   type        = string
-  ephemeral   = true
   default     = null
   description = "(Optional) The Password which should be used for the local-administrator on this Virtual Machine. Changing this forces a new resource to be created."
+  ephemeral   = true
 
   validation {
     condition     = var.admin_password == null || can(regex("^.{8,123}$", var.admin_password))
@@ -378,9 +379,9 @@ variable "computer_name" {
 
 variable "custom_data" {
   type        = string
-  ephemeral   = true
   default     = null
   description = "(Optional) The Base64-Encoded Custom Data which should be used for this Virtual Machine. Changing this forces a new resource to be created."
+  ephemeral   = true
 
   validation {
     condition     = var.custom_data == null || can(base64decode(var.custom_data))

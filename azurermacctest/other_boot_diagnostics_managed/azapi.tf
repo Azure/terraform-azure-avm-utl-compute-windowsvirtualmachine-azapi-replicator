@@ -27,10 +27,10 @@ module "replicator" {
   }
 
   resource_group_id = azurerm_resource_group.test.id
-  enable_telemetry = false
+  enable_telemetry  = false
 }
 
-output identity {
+output "identity" {
   value = module.replicator.azapi_header.identity
 }
 
